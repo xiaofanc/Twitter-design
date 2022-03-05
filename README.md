@@ -18,4 +18,4 @@ python --version            # 3.6.9
 python -m django --version  # 3.1.3
 
 
-## web Framework: Django
+## Web Framework: Django
