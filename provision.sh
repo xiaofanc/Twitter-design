@@ -14,7 +14,8 @@ if ! [ -e /vagrant/mysql-apt-config_0.8.15-1_all.deb ]; then
 	wget -c https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb
 fi
 
-sudo apt-get install dialog apt-utils
+# sudo apt-get install dialog apt-utils
+# sudo dpkg --configure -a
 sudo dpkg -i mysql-apt-config_0.8.15-1_all.deb
 sudo DEBIAN_FRONTEND=noninteractivate apt-get install -y mysql-server
 sudo apt-get install -y libmysqlclient-dev
