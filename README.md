@@ -15,7 +15,7 @@ python -m django --version  # 3.1.3
 
 
 ## Web Framework: Django
-### Initial Django project
+### Initialize Django project
 `settings.py`
 #### automatically set up the components
 ```
@@ -23,5 +23,17 @@ python manage.py migrate
 python manage.py runserver 0.0.0.0:8000
 ```
 
-## Django Rest Framework
+### Install Django Rest Framework
+
+### User Authentication API
+pythonmanage.py startapp accounts
+`views.py` 
+
+### Unit Test
+
+
+
+
+
+
 
