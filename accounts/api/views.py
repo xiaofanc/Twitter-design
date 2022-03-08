@@ -29,7 +29,10 @@ class AccountViewSet(viewsets.ViewSet):
 
     @action(methods=['GET'], detail=False)
     def login_status(self, request):
-        data = {'has_logged_in': request.user.is_authenticated}
+        data = {
+            'has_logged_in': request.user.is_authenticated,
+            'ip': request.META['REMOTE_ADDR'],
+        }
         if request.user.is_authenticated:
             data['user'] = UserSerializer(request.user).data
         return Response(data)
@@ -56,12 +59,6 @@ class AccountViewSet(viewsets.ViewSet):
 
         # queryset = User.objects.filter(username=username)
         # print(queryset.query)
-
-        if not User.objects.filter(username=username).exists():
-            return Response({
-                "success": False,
-                "message": "user does not exist",
-            }, status=400)
 
         user = django_authenticate(username=username, password=password)
         if not user or user.is_anonymous:
