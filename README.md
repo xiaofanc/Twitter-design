@@ -8,15 +8,15 @@ vagrant up
 vagrant ssh
 ```
 Check version:
-`python --version`            # 3.6.9
+`python --version`            # 3.6.9 \
 `python -m django --version`  # 3.1.3
 
 ## Web Framework: Django
 ### Initialize Django project
-Start the project:
+Start the project: \
 `django-admin.py startproject twitter` 
 
-Move the twitter/manage.py and twitter/twitter/ up level:
+Move the twitter/manage.py and twitter/twitter/ up level: \
 ```
 mv twitter/manage.py ./
 mv twitter/twitter/ twitter-temp
@@ -24,8 +24,8 @@ rm -rf twitter
 mv twitter-temp/ twitter
 ```
 
-Update setting.py:  
-* database to MySQL
+Update setting.py:  \
+* database to MySQL \
 ```
 DATABASES = {
     'default': {
@@ -39,16 +39,16 @@ DATABASES = {
 }
 
 ```
-* add allowedhosts
+* add allowedhosts \
 `ALLOWED_HOSTS = ['127.0.0.1', '192.168.33.10', 'localhost']`
 
-Create tables for the database:
+Create tables for the database: \
 `python manage.py migrate`
 
-Test run the server and type 'localhost' in the chrome to check
+Test run the server and type 'localhost' in the chrome to check \
 `python manage.py runserver 0.0.0.0:8000`
 
-Create superuser and run server again
+Create superuser and run server again \
 `python manage.py createsuperuser`
 
 ### Install Django Rest Framework
