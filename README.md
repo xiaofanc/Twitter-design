@@ -7,7 +7,7 @@ Setup environment and install components in provision.sh:
 vagrant up
 vagrant ssh
 ```
-Check version:
+Check version: \
 `python --version`            # 3.6.9 \
 `python -m django --version`  # 3.1.3
 
@@ -16,7 +16,7 @@ Check version:
 Start the project: \
 `django-admin.py startproject twitter` 
 
-Move the twitter/manage.py and twitter/twitter/ up level: \
+Move the twitter/manage.py and twitter/twitter/ up level:
 ```
 mv twitter/manage.py ./
 mv twitter/twitter/ twitter-temp
@@ -24,8 +24,8 @@ rm -rf twitter
 mv twitter-temp/ twitter
 ```
 
-Update setting.py:  \
-* database to MySQL \
+Update setting.py:  
+* database to MySQL 
 ```
 DATABASES = {
     'default': {
