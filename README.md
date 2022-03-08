@@ -89,6 +89,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 ```
 
+### User Authentication API
+update `accounts/api/serializers.py` and `accounts/api/view.py` to implement signup, login, logout, log_status API
+
 ### Unit Test
 `python manage.py test -v2`
 
