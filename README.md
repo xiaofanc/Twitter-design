@@ -59,7 +59,7 @@ pip freeze > requirements.txt
 Create a service and move `views.py` to api folder: \
 `python manage.py startapp accounts`
 
-Updates in `twitter/settings.py`:\
+Updates in `twitter/settings.py`:
 * add `'rest_framework'` in INSTALLED_APPS 
 * add pagination setting:
 ```
@@ -69,7 +69,7 @@ REST_FRAMEWORK = {
 }
 ```
 
-Updates of URL Configuration in `twitter/urls.py`:\
+Updates of URL Configuration in `twitter/urls.py`:
 * wire up our API using automatic URL routing
 ```
 router = routers.DefaultRouter()
