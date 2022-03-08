@@ -24,8 +24,8 @@ rm -rf twitter
 mv twitter-temp/ twitter
 ```
 
-Update setting.py:  
-* database to MySQL 
+Updates in twitter/setting.py:  
+* change DATABASES to MySQL 
 ```
 DATABASES = {
     'default': {
@@ -45,17 +45,49 @@ DATABASES = {
 Create tables for the database: \
 `python manage.py migrate`
 
-Test run the server and type 'localhost' in the chrome to check \
+Test run the server and type 'localhost' in the chrome to check: \
 `python manage.py runserver 0.0.0.0:8000`
 
-Create superuser and run server again \
+Create superuser and run server again: \
 `python manage.py createsuperuser`
 
 ### Install Django Rest Framework
+```
+pip install djangorestframework
+pip freeze > requirements.txt
+```
+Create a service and move `views.py` to api folder: \
+`python manage.py startapp accounts`
 
-### User Authentication API
-pythonmanage.py startapp accounts
-`views.py` 
+Updates in `twitter/settings.py`:\
+* add `'rest_framework'` in INSTALLED_APPS 
+* add pagination setting:
+```
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+```
+
+Updates of URL Configuration in `twitter/urls.py`:\
+* wire up our API using automatic URL routing
+```
+router = routers.DefaultRouter()
+router.register(r'api/users', views.UserViewSet)
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+]
+```
+* define serializers under accounts/api/
+```
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'email']
+
+```
 
 ### Unit Test
 `python manage.py test -v2`
