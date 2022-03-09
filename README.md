@@ -126,8 +126,8 @@ possible_keys = possible_index, key = index
 
 #### Warning: 
 Newly added features must have `null=True` in order to avoid crashing the server. i.e. `email = models.EmailField(null=True)`\
-In production, delete and add features cannot be in the same commit. Django ORM table should have features >= code.model\
-* If deleting a feature, first restart web server (deploy the code), then migrate (change the table).\
+In production, delete and add features cannot be in the same commit. Django ORM table should have features >= code.model
+* If deleting a feature, first restart web server (deploy the code), then migrate (change the table).
 * If adding a feature, first migrate (change the table), then restart the web server (deploy the code).
 
 
