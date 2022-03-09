@@ -1,7 +1,7 @@
 # Twitter-design
 Design a Twitter from scratch
 
-## VM Environment Setup
+## Virtual Environment Setup
 Setup environment and install components in provision.sh:
 ```
 vagrant up
