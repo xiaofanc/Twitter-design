@@ -2,6 +2,7 @@
 Design a Twitter from scratch
 
 ## Virtual Environment Setup
+Install VirtualBox and Vagrant\
 Setup environment and install components in provision.sh:
 ```
 vagrant up
