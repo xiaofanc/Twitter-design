@@ -109,7 +109,18 @@ python manage.py migrate
 * Interact with DB directly on terminal:
 ```
 python manage.py shell
+mysql -uroot -pyourpassword
+show databases;
+use twitter;
+show tables;
 ```
+* check if index is used and create index if none:
+```
+explain select * from django_migrations where name="0001_initial";
+create index django_migrations_name_idx on django_migrations(name);
+```
+possible_keys = possible_index, key = index
+
 #### Warning: 
 * newly added features must have `null=True` in order to avoid crashing the server. i.e. `email = models.EmailField(null=True)`
 * In production, delete and add features cannot be in the same commit. Django ORM table should have features >= code.model\
