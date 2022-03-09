@@ -97,18 +97,21 @@ update `accounts/api/serializers.py` and `accounts/api/view.py` to implement sig
 ### Documentation
 #### Migration
 Migration is used to update the tables:
-* If app does not have migrations folder, then init:
+* if app does not have migrations folder, then init:
 ```
 python manage.py makemigrations account
 ```
-* If model is updated, then run:
+* if model is updated, then run:
 ```
 python manage.py makemigrations
 python manage.py migrate
 ```
-* Interact with DB directly on terminal:
+* interact with DB directly on terminal:
 ```
 python manage.py shell
+```
+* check MySQL database
+```
 mysql -uroot -pyourpassword
 show databases;
 use twitter;
