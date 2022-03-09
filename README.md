@@ -95,8 +95,23 @@ update `accounts/api/serializers.py` and `accounts/api/view.py` to implement sig
 ### Unit Test
 `python manage.py test -v2`
 
-
-
+### Documentation
+#### Migration
+Migration is used to update the tables:\
+If app does not have migrations folder, then init:\
+`python manage.py makemigrations account`
+If model is updated, then run:\
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+Interact with DB directly on terminal:\
+`python manage.py shell`
+Warning: \
+newly added features must have `null=True` in order to avoid crashing the server. i.e. `email = models.EmailField(null=True)`
+In production, delete and add features cannot be in the same commit. Django ORM table should have features >= code.model\
+* If deleting a feature, first restart web server (deploy the code), then migrate (change the table).
+* If adding a feature, first migrate (change the table), then restart the web server (deploy the code).
 
 
 

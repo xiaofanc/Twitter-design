@@ -112,7 +112,7 @@ class AccountApiTests(TestCase):
             'email': 'someone@jiuzhang.com',
             'password': 'any password',
         })
-        # print(response.data)
+        print(response.data)
         self.assertEqual(response.status_code, 400)
 
         # 成功注册
