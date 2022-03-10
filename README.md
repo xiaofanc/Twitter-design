@@ -95,6 +95,13 @@ update `accounts/api/serializers.py` and `accounts/api/view.py` to implement sig
 ### Unit Test
 `python manage.py test -v2`
 
+### Design Tweet Model, API & Tests
+
+### Design Friendship Model, API & Tests
+
+### Design Newsfeed Model, API & Tests
+
+
 ### Documentation
 #### Migration
 Migration is used to update the tables:
