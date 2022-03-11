@@ -85,12 +85,21 @@ Updates of URL Configuration in `twitter/urls.py`:
 * wire up our API using automatic URL routing
 ```
 router = routers.DefaultRouter()
-router.register(r'api/users', views.UserViewSet)
+router.register(r'api/users', UserViewSet)
+router.register(r'api/accounts', AccountViewSet, basename = 'accounts')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
+```
+
+Runsever to test API in Chrome:
+```
+http://localhost/api/accounts/login/
+http://localhost/api/accounts/login_status/
+http://localhost/api/accounts/signup/
+http://localhost/api/accounts/logout/
 ```
 
 #### Unit Test
@@ -106,7 +115,7 @@ Updates in `twitter/settings.py`:
 
 Define Tweet model in `tweets/models.py`
 * table: `user, content, created_at`
-* add composite key
+* add composite key ('user_id', 'created_at')
 * property: `hours_to_now`
 
 Updates in `tweets/admin.py`:
@@ -143,7 +152,21 @@ class TweetSerializer(serializers.ModelSerializer):
 ```
 Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement create, list API
 
+Updates of URL Configuration in `twitter/urls.py`:
+```
+router.register(r'api/tweets', TweetViewSet, basename = 'tweets')
+```
+
+Runsever to test API in Chrome:
+```
+http://localhost/api/tweets/
+list?????
+```
+
 #### Tweet API Tests
+Create a class TestCase for all of the testing in a new folder testing: 
+* generate create_user and create_tweet method 
+
 Add tests in `tweets/tests.py` to test hours_to_now:\
 `python manage.py test tweets`
 

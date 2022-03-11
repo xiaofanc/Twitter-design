@@ -7,6 +7,11 @@ class Tweet(models.Model):
     content = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True) # utc time
 
+    # add composite key
+    class Meta:
+        index_together = (('user', 'created_at'),)
+        ordering = ('user', '-created_at')
+        
     @property
     def hours_to_now(self):
         # datatime.now 不带时区信息，需要加上utc的时区信息
