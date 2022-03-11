@@ -1,7 +1,7 @@
 # Twitter-design
 Design a Twitter from scratch
 
-## Virtual Environment Setup
+## VM Setup
 Install VirtualBox and Vagrant\
 Setup environment and install components in provision.sh:
 ```
@@ -105,7 +105,7 @@ http://localhost/api/accounts/signup/
 http://localhost/api/accounts/logout/
 ```
 
-#### Account API Tests
+#### User API Tests
 Add tests in `accounts/tests.py` to test_login, test_logout and test_signup:\
 ```
 python manage.py test accounts -v2
