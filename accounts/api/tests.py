@@ -16,7 +16,7 @@ class AccountApiTests(TestCase):
         self.client = APIClient()
         self.user = self.createUser(
             username='admin',
-            email='admin@jiuzhang.com',
+            email='admin@twitter.com',
             password='correct password',
         )
 

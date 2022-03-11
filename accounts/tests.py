@@ -16,10 +16,10 @@ class AccountApiTests(TestCase):
         self.client = APIClient()
         self.user = self.create_user(
             username='admin',
-            email='admin@jiuzhang.com',
+            email='admin@twitter.com',
             password='correct password',
         )
-        
+
     def test_login(self):
         # 每个测试函数必须以 test_ 开头，才会被自动调用进行测试
         # 测试必须用 post 而不是 get
@@ -47,7 +47,7 @@ class AccountApiTests(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.data['user'], None)
-        self.assertEqual(response.data['user']['email'], 'admin@jiuzhang.com')
+        self.assertEqual(response.data['user']['email'], 'admin@twitter.com')
         # 验证已经登录了
         response = self.client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], True)
