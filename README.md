@@ -57,9 +57,6 @@ Create superuser and run server again: \
 pip install djangorestframework
 pip freeze > requirements.txt
 ```
-Create a user component and move `views.py` to api folder: \
-`python manage.py startapp accounts`
-
 Updates in `twitter/settings.py`:
 * add `'rest_framework'` in INSTALLED_APPS 
 * add pagination setting:
@@ -69,6 +66,20 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 ```
+
+### Design User Model, API & Tests
+#### User Authentication API
+Create a user component and move `views.py` to api folder: \
+`python manage.py startapp accounts`
+
+Define serializers under accounts/api/:
+```
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
+```
+Update `accounts/api/serializers.py` and `accounts/api/views.py` to implement signup, login, logout, log_status API
 
 Updates of URL Configuration in `twitter/urls.py`:
 * wire up our API using automatic URL routing
@@ -82,17 +93,7 @@ urlpatterns = [
 ]
 ```
 
-Define serializers under accounts/api/
-```
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['url', 'username', 'email']
-```
-### User Authentication API
-update `accounts/api/serializers.py` and `accounts/api/view.py` to implement signup, login, logout, log_status API
-
-### Unit Test
+#### Unit Test
 `python manage.py test -v2`
 
 ### Design Tweet Model, API & Tests
@@ -104,7 +105,8 @@ Updates in `twitter/settings.py`:
 * add `'tweets'` in INSTALLED_APPS 
 
 Define Tweet model in `tweets/models.py`
-* Table: `user, content, created_at`
+* table: `user, content, created_at`
+* add composite key
 * property: `hours_to_now`
 
 Updates in `tweets/admin.py`:
@@ -131,6 +133,15 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 #### Tweet API
+Define serializers under tweets/api/:
+```
+class TweetSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = Tweet
+        fields = ('id', 'user', 'created_at', 'content')
+```
+Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement create, list API
 
 #### Tweet API Tests
 Add tests in `tweets/tests.py` to test hours_to_now:\
