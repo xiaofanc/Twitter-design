@@ -129,10 +129,11 @@ Migrate to create the Tweet table in database:
 python manage.py makemigrations
 python manage.py migrate
 ```
-
 #### Tweet API
+
 #### Tweet API Tests
-Add tests in `tweets/tests.py` to test hours_to_now
+Add tests in `tweets/tests.py` to test hours_to_now\
+`python manage.py test tweets`
 
 ### Design Friendship Model, API & Tests
 #### Friendship Model
