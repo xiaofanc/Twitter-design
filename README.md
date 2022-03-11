@@ -65,7 +65,11 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 ```
+
 ### Design User Model, API & Tests
+#### User Model
+Django has default user model, no need to create
+
 #### User Authentication API
 Create a user component and move `views.py` to api folder: \
 `python manage.py startapp accounts`
@@ -103,7 +107,9 @@ http://localhost/api/accounts/logout/
 
 #### Account API Tests
 Add tests in `accounts/tests.py` to test_login, test_logout and test_signup:\
-`python manage.py test accounts -v2`
+```
+python manage.py test accounts -v2
+```
 
 ### Design Tweet Model, API & Tests
 #### Tweet Model
@@ -172,7 +178,9 @@ Create a class TestCase for all of the testing in a new folder testing:
 * generate create_user and create_tweet method 
 
 Add tests in `tweets/tests.py` to test_hours_to_now, test_list_api and test_create_api:\
-`python manage.py test tweets`
+```
+python manage.py test tweets
+```
 
 ### Design Friendship Model, API & Tests
 #### Friendship Model
