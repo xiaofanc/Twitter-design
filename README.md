@@ -79,6 +79,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email']
 ```
+
 Update `accounts/api/serializers.py` and `accounts/api/views.py` to implement signup, login, logout, log_status API
 
 Updates of URL Configuration in `twitter/urls.py`:
@@ -102,8 +103,9 @@ http://localhost/api/accounts/signup/
 http://localhost/api/accounts/logout/
 ```
 
-#### Unit Test
-`python manage.py test -v2`
+#### Account API Tests
+Add tests in `accounts/tests.py` to test_login, test_logout and test_signup:\
+`python manage.py test accounts -v2`
 
 ### Design Tweet Model, API & Tests
 #### Tweet Model
@@ -141,6 +143,7 @@ Migrate to create the Tweet table in database:
 python manage.py makemigrations
 python manage.py migrate
 ```
+
 #### Tweet API
 Define serializers under tweets/api/:
 ```
@@ -150,6 +153,7 @@ class TweetSerializer(serializers.ModelSerializer):
         model = Tweet
         fields = ('id', 'user', 'created_at', 'content')
 ```
+
 Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement create, list API
 
 Updates of URL Configuration in `twitter/urls.py`:
@@ -158,16 +162,18 @@ router.register(r'api/tweets', TweetViewSet, basename = 'tweets')
 ```
 
 Runsever to test API in Chrome:
+* need to login first to create tweets
+* no need to login to check the list of tweets for a specific user_id
 ```
 http://localhost/api/tweets/
-list?????
+http://localhost/api/tweets/?user_id=1
 ```
 
 #### Tweet API Tests
 Create a class TestCase for all of the testing in a new folder testing: 
 * generate create_user and create_tweet method 
 
-Add tests in `tweets/tests.py` to test hours_to_now:\
+Add tests in `tweets/tests.py` to test_hours_to_now, test_list_api and test_create_api:\
 `python manage.py test tweets`
 
 ### Design Friendship Model, API & Tests
