@@ -89,13 +89,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ['url', 'username', 'email']
 ```
-
 ### User Authentication API
 update `accounts/api/serializers.py` and `accounts/api/view.py` to implement signup, login, logout, log_status API
 
 ### Unit Test
 `python manage.py test -v2`
-
+\
 ### Design Tweet Model, API & Tests
 #### Tweet Model
 Create a tweet component and move `views.py` to api folder: \
@@ -122,7 +121,9 @@ cd utils
 cd ..
 ```
 * create method `utc_now` to add UTC info to `datetime.now`\
-`return datetime.now.replace(tzinfo=pytz.utc)`
+```
+return datetime.now().replace(tzinfo=pytz.utc)
+```
 
 Migrate to create the Tweet table in database:
 ```
