@@ -94,7 +94,7 @@ update `accounts/api/serializers.py` and `accounts/api/view.py` to implement sig
 
 ### Unit Test
 `python manage.py test -v2`
-\
+
 ### Design Tweet Model, API & Tests
 #### Tweet Model
 Create a tweet component and move `views.py` to api folder: \
@@ -120,7 +120,7 @@ cd utils
 > time_helpers.py
 cd ..
 ```
-* create method `utc_now` to add UTC info to `datetime.now`\
+* create method `utc_now` to add UTC info to `datetime.now`
 ```
 return datetime.now().replace(tzinfo=pytz.utc)
 ```
@@ -133,7 +133,7 @@ python manage.py migrate
 #### Tweet API
 
 #### Tweet API Tests
-Add tests in `tweets/tests.py` to test hours_to_now\
+Add tests in `tweets/tests.py` to test hours_to_now:\
 `python manage.py test tweets`
 
 ### Design Friendship Model, API & Tests
