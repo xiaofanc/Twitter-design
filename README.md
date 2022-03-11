@@ -57,7 +57,7 @@ Create superuser and run server again: \
 pip install djangorestframework
 pip freeze > requirements.txt
 ```
-Create a service and move `views.py` to api folder: \
+Create a user component and move `views.py` to api folder: \
 `python manage.py startapp accounts`
 
 Updates in `twitter/settings.py`:
@@ -81,7 +81,8 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 ```
-* define serializers under accounts/api/
+
+Define serializers under accounts/api/
 ```
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -96,11 +97,51 @@ update `accounts/api/serializers.py` and `accounts/api/view.py` to implement sig
 `python manage.py test -v2`
 
 ### Design Tweet Model, API & Tests
+#### Tweet Model
+Create a tweet component and move `views.py` to api folder: \
+`python manage.py startapp tweets`
+
+Updates in `twitter/settings.py`:
+* add `'tweets'` in INSTALLED_APPS 
+
+Define Tweet model in `tweets/models.py`
+* Table: `user, content, created_at`
+* property: `hours_to_now`
+
+Updates in `tweets/admin.py`:
+register TweetAdmin to admin
+
+Create time helper function in utils:
+* create folder
+```
+cd /vagrant
+mkdirs utils
+cd utils
+> __init__.py
+> time_helpers.py
+cd ..
+```
+* create method `utc_now` to add UTC info to `datetime.now`\
+`return datetime.now.replace(tzinfo=pytz.utc)`
+
+Migrate to create the Tweet table in database:
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
+#### Tweet API
+#### Tweet API Tests
+Add tests in `tweets/tests.py` to test hours_to_now
 
 ### Design Friendship Model, API & Tests
-
+#### Friendship Model
+#### Friendship API
+#### Friendship API Tests
 ### Design Newsfeed Model, API & Tests
-
+#### Newsfeed Model
+#### Newsfeed API
+#### Newsfeed API Tests
 
 ### Documentation
 #### Migration
