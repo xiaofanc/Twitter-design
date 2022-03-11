@@ -38,7 +38,6 @@ DATABASES = {
         'PASSWORD': 'yourpassword'
     }
 }
-
 ```
 * add allowedhosts \
 `ALLOWED_HOSTS = ['127.0.0.1', '192.168.33.10', 'localhost']`
@@ -66,7 +65,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 ```
-
 ### Design User Model, API & Tests
 #### User Authentication API
 Create a user component and move `views.py` to api folder: \
