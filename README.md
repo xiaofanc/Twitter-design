@@ -289,7 +289,7 @@ localhost/admin
 ```
 
 #### Newsfeed API
-Define a sevice in `friendships/services.py` to get_followers:
+Define a sevice in `friendships/services.py` to get_followers for the user:
 ```
 class FriendshipService(object):
     @classmethod
@@ -298,6 +298,20 @@ class FriendshipService(object):
             to_user = user,
         ).prefetch_related('from_user')
         return [friendships.from_user for friendship in friendships]
+```
+
+Define the fanout service in `newsfeeds/services.py` and create the newsfeeds using bulk_create:
+```
+class NewsFeedService(object):
+    @classmethod
+    def fanout_to_followers(cls, tweet):
+        newsfeeds = [
+            Newsfeed(user=follower, tweet=tweet)
+            for follower in FriendshipService.get_followers(tweet.user)
+        ]
+        newsfeeds.append(Newsfeed(user = tweet.user, tweet = tweet))
+        # insert into the table using one SQL
+        Newsfeed.objects.bulk_create(newsfeeds)
 ```
 
 #### Newsfeed API Tests
