@@ -265,7 +265,7 @@ Updates in `twitter/settings.py`:
 * add `'newsfeeds'` in INSTALLED_APPS 
 
 Define Newsfeed model in `newsfeeds/models.py`
-* table: `user, tweet, created_at`, `user` represents who can see the tweet
+* table: `user, tweet, created_at`, `user` represents who can see the `tweet`
 * add composite key and unique key
 ```
 class Meta:
