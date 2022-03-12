@@ -251,14 +251,55 @@ http://localhost/api/friendships/1/unfollow/  # unfollow user_id = 1
 ```
 
 #### Friendship API Tests
+#### Newsfeed Model
 Add tests in `friendships/tests.py` to test_follow, test_unfollow, test_followings and test_followers:
 ```
 python manage.py test friendships
 ```
 
 ### Design Newsfeed Model, API & Tests
-#### Newsfeed Model
+Create a newsfeed component and move `views.py` to api folder: \
+`python manage.py startapp newsfeeds`
+
+Updates in `twitter/settings.py`:
+* add `'newsfeeds'` in INSTALLED_APPS 
+
+Define Newsfeed model in `newsfeeds/models.py`
+* table: `user, tweet, created_at`, `user` represents who can see the tweet
+* add composite key and unique key
+```
+class Meta:
+    index_together = (('user', 'created_at'),)
+    unique_together = (('user', 'tweet'),)
+    ordering = ('user', '-created_at',)
+```
+
+Updates in `newsfeeds/admin.py`:
+register NewsfeedAdmin to admin
+
+Migrate to create the Friendship table in database:
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
+Check in chrome:
+```
+localhost/admin
+```
+
 #### Newsfeed API
+Define a sevice in `friendships/services.py` to get_followers:
+```
+class FriendshipService(object):
+    @classmethod
+    def get_followers(cls, user):
+        friendships = Friendship.objects.filter(
+            to_user = user,
+        ).prefetch_related('from_user')
+        return [friendships.from_user for friendship in friendships]
+```
+
 #### Newsfeed API Tests
 
 ### Documentation
