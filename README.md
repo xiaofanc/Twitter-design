@@ -187,7 +187,7 @@ http://localhost/api/tweets/?user_id=1
 Create a class TestCase for all of the testing in a new folder testing: 
 * generate create_user and create_tweet method 
 
-Add tests in `tweets/tests.py` to test_hours_to_now, test_list_api and test_create_api:\
+Add tests in `tweets/tests.py` to test_hours_to_now, test_list_api and test_create_api:
 ```
 python manage.py test tweets
 ```
@@ -251,6 +251,10 @@ http://localhost/api/friendships/1/unfollow/  # unfollow user_id = 1
 ```
 
 #### Friendship API Tests
+Add tests in `friendships/tests.py` to test_follow, test_unfollow, test_followings and test_followers:
+```
+python manage.py test friendships
+```
 
 ### Design Newsfeed Model, API & Tests
 #### Newsfeed Model

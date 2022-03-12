@@ -81,4 +81,4 @@ class FriendshipViewSet(viewsets.GenericViewSet):
             to_user = pk,
         ).delete()
         
-        return Response({'success': True, 'deleted': True}, status=201)
+        return Response({'success': True, 'deleted': deleted}, status=200)
