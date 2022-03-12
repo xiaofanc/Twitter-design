@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'accounts',
     'tweets',
+    'friendships'
 ]
 
 REST_FRAMEWORK = {

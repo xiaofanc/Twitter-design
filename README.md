@@ -80,6 +80,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
+
+class LoginSerializer(serializers.Serializer):
+......
+
+class SignupSerializer(serializers.ModelSerializer):
+......
 ```
 
 Update `accounts/api/serializers.py` and `accounts/api/views.py` to implement signup, login, logout, log_status API
@@ -156,6 +162,9 @@ class TweetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tweet
         fields = ('id', 'user', 'created_at', 'content')
+
+class TweetCreateSerializer(serializers.ModelSerializer):
+......
 ```
 
 Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement create, list API
@@ -184,8 +193,63 @@ python manage.py test tweets
 
 ### Design Friendship Model, API & Tests
 #### Friendship Model
+Create a friendships component and move `views.py` to api folder: \
+`python manage.py startapp friendships`
+
+Updates in `twitter/settings.py`:
+* add `'friendships'` in INSTALLED_APPS 
+
+Define Tweet model in `friendships/models.py`
+* table: `from_user, to_user, created_at`
+* add composite key and unique key
+```
+    class Meta:
+        index_together = (
+            ('from_user_id', 'created_at'),
+            ('to_user_id', 'created_at'),
+        )
+        unique_together = (('from_user_id', 'to_user_id'),)
+```
+
+Updates in `friendships/admin.py`:
+register FriendshipAdmin to admin
+
+Migrate to create the Friendship table in database:
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
 #### Friendship API
+Define serializers under friendships/api/:
+```
+class FriendCreateSerializer(serializers.ModelSerializer):
+......
+class FollowerSerializer(serializers.ModelSerializer):
+......
+class FollowingSerializer(serializers.ModelSerializer):
+......
+```
+
+Update `friendships/api/serializers.py` and `friendships/api/views.py` to implement getfollewers, getfollowings, follow and unfollow API
+
+Updates of URL Configuration in `twitter/urls.py`:
+```
+router.register(r'api/friendships', FriendshipViewSet, basename = 'friendships')
+```
+
+Runsever to test API in Chrome:
+* need to have user_id in URLs
+* no need to login first for follow and unfollow API
+```
+http://localhost/api/friendships/1/followers/
+http://localhost/api/friendships/2/followings/
+http://localhost/api/friendships/1/follow/    # follow user_id = 1
+http://localhost/api/friendships/1/unfollow/  # unfollow user_id = 1
+```
+
 #### Friendship API Tests
+
 ### Design Newsfeed Model, API & Tests
 #### Newsfeed Model
 #### Newsfeed API
