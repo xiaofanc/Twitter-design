@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework import exceptions
 from accounts.api.serializers import UserSerializer
 from tweets.models import Tweet
 
