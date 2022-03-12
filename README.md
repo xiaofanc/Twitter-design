@@ -178,6 +178,7 @@ Runsever to test API in Chrome:
 * need to login first to create tweets
 * no need to login to check the list of tweets for a specific user_id
 ```
+http://localhost/admin/
 http://localhost/api/tweets/
 http://localhost/api/tweets/?user_id=1
 ```
@@ -199,16 +200,16 @@ Create a friendships component and move `views.py` to api folder: \
 Updates in `twitter/settings.py`:
 * add `'friendships'` in INSTALLED_APPS 
 
-Define Tweet model in `friendships/models.py`
+Define Friend model in `friendships/models.py`
 * table: `from_user, to_user, created_at`
 * add composite key and unique key
 ```
-    class Meta:
-        index_together = (
-            ('from_user_id', 'created_at'),
-            ('to_user_id', 'created_at'),
-        )
-        unique_together = (('from_user_id', 'to_user_id'),)
+class Meta:
+    index_together = (
+        ('from_user_id', 'created_at'),
+        ('to_user_id', 'created_at'),
+    )
+    unique_together = (('from_user_id', 'to_user_id'),)
 ```
 
 Updates in `friendships/admin.py`:
@@ -240,8 +241,9 @@ router.register(r'api/friendships', FriendshipViewSet, basename = 'friendships')
 
 Runsever to test API in Chrome:
 * need to have user_id in URLs
-* no need to login first for follow and unfollow API
+* need to login first for follow and unfollow API
 ```
+http://localhost/admin/
 http://localhost/api/friendships/1/followers/
 http://localhost/api/friendships/2/followings/
 http://localhost/api/friendships/1/follow/    # follow user_id = 1
