@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from newsfeeds.services import NewsFeedService
 from tweets.api.serializers import (
     TweetCreateSerializer, 
     TweetSerializer,
@@ -39,6 +40,10 @@ class TweetViewSet(viewsets.GenericViewSet,
         
         # save data to db
         tweet = serializer.save()
+
+        # 增加发推文的时候，自动把推文加到newsfeed
+        NewsFeedService.fanout_to_followers(tweet)
+
         return Response(TweetSerializer(tweet).data, status=201)
 
     def list(self, request, *args, **kwargs):
