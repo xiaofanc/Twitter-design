@@ -13,4 +13,4 @@ class FriendshipService(object):
         friendships = Friendship.objects.filter(
             to_user = user,
         ).prefetch_related('from_user')
-        return [friendships.from_user for friendship in friendships]
+        return [friendship.from_user for friendship in friendships]
