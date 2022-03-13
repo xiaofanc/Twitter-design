@@ -314,6 +314,34 @@ class NewsFeedService(object):
         Newsfeed.objects.bulk_create(newsfeeds)
 ```
 
+Define serializers under newsfeeds/api/:
+```
+class FriendCreateSerializer(serializers.ModelSerializer):
+......
+class FollowerSerializer(serializers.ModelSerializer):
+......
+class FollowingSerializer(serializers.ModelSerializer):
+......
+```
+
+Update `newsfeeds/api/serializers.py` and `newsfeeds/api/views.py` to implement getfollewers, getfollowings, follow and unfollow API
+
+Updates of URL Configuration in `twitter/urls.py`:
+```
+router.register(r'api/newsfeeds', FriendshipViewSet, basename = 'newsfeeds')
+```
+
+Runsever to test API in Chrome:
+* need to have user_id in URLs
+* need to login first for follow and unfollow API
+```
+http://localhost/admin/
+http://localhost/api/newsfeeds/1/followers/
+http://localhost/api/newsfeeds/2/followings/
+http://localhost/api/newsfeeds/1/follow/    # follow user_id = 1
+http://localhost/api/newsfeeds/1/unfollow/  # unfollow user_id = 1
+```
+
 #### Newsfeed API Tests
 
 ### Documentation
