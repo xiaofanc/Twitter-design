@@ -247,7 +247,7 @@ http://localhost/admin/
 http://localhost/api/friendships/2/followers/  # 2's followers
 http://localhost/api/friendships/2/followings/ # 2 is following who
 http://localhost/api/friendships/1/follow/     # follow user_id = 1
-http://localhost/api/friendships/1/unfollow/  # unfollow user_id = 1
+http://localhost/api/friendships/1/unfollow/   # unfollow user_id = 1
 ```
 
 #### Friendship API Tests
@@ -334,7 +334,6 @@ router.register(r'api/newsfeeds', NewsFeedViewSet, basename = 'newsfeeds')
 ```
 
 Runsever to test API in Chrome:
-* need to have user_id in URLs
 * need to login first for list API
 ```
 # create a new_user and login
