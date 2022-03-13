@@ -316,11 +316,7 @@ class NewsFeedService(object):
 
 Define serializers under newsfeeds/api/:
 ```
-class FriendCreateSerializer(serializers.ModelSerializer):
-......
-class FollowerSerializer(serializers.ModelSerializer):
-......
-class FollowingSerializer(serializers.ModelSerializer):
+class NewsFeedSerializer(serializers.ModelSerializer):
 ......
 ```
 
@@ -328,7 +324,7 @@ Update `newsfeeds/api/serializers.py` and `newsfeeds/api/views.py` to implement 
 
 Updates of URL Configuration in `twitter/urls.py`:
 ```
-router.register(r'api/newsfeeds', FriendshipViewSet, basename = 'newsfeeds')
+router.register(r'api/newsfeeds', NewsfeedViewSet, basename = 'newsfeeds')
 ```
 
 Runsever to test API in Chrome:
