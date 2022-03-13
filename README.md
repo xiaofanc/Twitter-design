@@ -244,20 +244,20 @@ Runsever to test API in Chrome:
 * need to login first for follow and unfollow API
 ```
 http://localhost/admin/
-http://localhost/api/friendships/1/followers/
-http://localhost/api/friendships/2/followings/
-http://localhost/api/friendships/1/follow/    # follow user_id = 1
+http://localhost/api/friendships/2/followers/  # 2's followers
+http://localhost/api/friendships/2/followings/ # 2 is following who
+http://localhost/api/friendships/1/follow/     # follow user_id = 1
 http://localhost/api/friendships/1/unfollow/  # unfollow user_id = 1
 ```
 
 #### Friendship API Tests
-#### Newsfeed Model
-Add tests in `friendships/tests.py` to test_follow, test_unfollow, test_followings and test_followers:
+Add tests in `friendships/tests.py` to test_follow, test_unfollow, test_followers and test_followings:
 ```
 python manage.py test friendships
 ```
 
 ### Design Newsfeed Model, API & Tests
+#### Newsfeed Model
 Create a newsfeed component and move `views.py` to api folder: \
 `python manage.py startapp newsfeeds`
 
@@ -314,28 +314,39 @@ class NewsFeedService(object):
         Newsfeed.objects.bulk_create(newsfeeds)
 ```
 
+Update in the create function in `tweets/api/view.py`:
+```
+# add tweet to the newsfeed table when creating
+NewsFeedService.fanout_to_followers(tweet)
+```
+
 Define serializers under newsfeeds/api/:
 ```
 class NewsFeedSerializer(serializers.ModelSerializer):
 ......
 ```
 
-Update `newsfeeds/api/serializers.py` and `newsfeeds/api/views.py` to implement getfollewers, getfollowings, follow and unfollow API
+Update `newsfeeds/api/serializers.py` and `newsfeeds/api/views.py` to implement list (list newsfeeds for the current login user) API
 
 Updates of URL Configuration in `twitter/urls.py`:
 ```
-router.register(r'api/newsfeeds', NewsfeedViewSet, basename = 'newsfeeds')
+router.register(r'api/newsfeeds', NewsFeedViewSet, basename = 'newsfeeds')
 ```
 
 Runsever to test API in Chrome:
 * need to have user_id in URLs
-* need to login first for follow and unfollow API
+* need to login first for list API
 ```
-http://localhost/admin/
-http://localhost/api/newsfeeds/1/followers/
-http://localhost/api/newsfeeds/2/followings/
-http://localhost/api/newsfeeds/1/follow/    # follow user_id = 1
-http://localhost/api/newsfeeds/1/unfollow/  # unfollow user_id = 1
+# create a new_user and login
+http://localhost/api/accounts/signup
+# new_user follows user_id = 1
+http://localhost/api/friendships/1/follow/
+# check followers of user_id = 1
+http://localhost/api/friendships/1/followers/
+# user_id = 1 login and create tweet
+http://localhost/api/tweets/
+# new_user login to check newsfeeds, which should include the tweet that user_id = 1 just created
+http://localhost/api/newsfeeds/
 ```
 
 #### Newsfeed API Tests
