@@ -350,6 +350,10 @@ http://localhost/api/newsfeeds/
 ```
 
 #### Newsfeed API Tests
+Add tests in `newsfeeds/tests.py` to test_list:
+```
+python manage.py test newsfeeds
+```
 
 ### Documentation
 #### Migration
