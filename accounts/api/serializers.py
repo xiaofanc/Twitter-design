@@ -10,6 +10,13 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email']
 
+class UserSerializerForFriendship(serializers.ModelSerializer):
+    """
+    control the output of your responses
+    """
+    class Meta:
+        model = User
+        fields = ['id', 'username']
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()

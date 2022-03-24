@@ -6,6 +6,7 @@ class Friendship(models.Model):
         User,
         on_delete = models.SET_NULL,
         null = True,
+        # same as rename
         related_name = 'following_friendship_set',
     )
     to_user = models.ForeignKey(
