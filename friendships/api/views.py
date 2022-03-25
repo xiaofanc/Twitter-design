@@ -39,7 +39,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
     # login user follow user_id = pk
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
     def follow(self, request, pk):
-        # check if user_id = pk exists
+        # check if user_id = pk exists, will return 404 not found if not exists
         self.get_object()
         if request.user.id == int(pk):
             return Response({
