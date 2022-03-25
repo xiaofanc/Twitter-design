@@ -1,7 +1,8 @@
 from django.forms import ValidationError
 from rest_framework import serializers
-from accounts.api.serializers import UserSerializer
+from accounts.api.serializers import UserSerializerForFriendship
 from friendships.models import Friendship
+from django.contrib.auth.models import User
 
 class FriendCreateSerializer(serializers.ModelSerializer):
     # 添加关注的serializer
@@ -17,6 +18,11 @@ class FriendCreateSerializer(serializers.ModelSerializer):
             raise ValidationError({
                 'message': 'from_user_id and to_user_id should be different'
             })
+
+        if not User.objecs.filter(id = attrs['to_user_id']).exists():
+            raise ValidationError({
+                'message': 'user does not exist.'
+            })
         return attrs
 
     def create(self, validated_data):
@@ -30,7 +36,7 @@ class FriendCreateSerializer(serializers.ModelSerializer):
 
 class FollowerSerializer(serializers.ModelSerializer):
     # 用于获取关注记录
-    user = UserSerializer(source = 'from_user')
+    user = UserSerializerForFriendship(source = 'from_user')
     created_at = serializers.DateTimeField()
 
     class Meta:
@@ -40,7 +46,7 @@ class FollowerSerializer(serializers.ModelSerializer):
 
 class FollowingSerializer(serializers.ModelSerializer):
     # 用于获取粉丝记录
-    user = UserSerializer(source = 'to_user')
+    user = UserSerializerForFriendship(source = 'to_user')
     created_at = serializers.DateTimeField()
 
     class Meta:
