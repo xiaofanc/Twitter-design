@@ -376,6 +376,7 @@ mysql -uroot -pyourpassword
 show databases;
 use twitter;
 show tables;
+show index from tweets_tweet;
 ```
 * check if index is used and create index if none:
 ```

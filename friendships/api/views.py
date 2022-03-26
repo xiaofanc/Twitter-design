@@ -17,6 +17,7 @@ class FriendshipViewSet(viewsets.GenericViewSet):
     # get all followers for user_id = pk, pk is in the URL
     # detail = True will call get_object() method to get queryset and check if queryset.filter(pk=1) exists
     # GET api/friendships/1/follwers
+    # url_path = 'followers' - define path in action
     @action(methods=['GET'], detail=True, permission_classes=[AllowAny])
     def followers(self, request, pk):
         friendships = Friendship.objects.filter(to_user_id=pk).order_by('-created_at')
