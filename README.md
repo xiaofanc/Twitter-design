@@ -391,6 +391,5 @@ In production, delete and add features cannot be in the same commit. Django ORM 
 * If deleting a feature, first restart web server (deploy the code), then migrate (change the table).
 * If adding a feature, first migrate (change the table), then restart the web server (deploy the code).
 
-test
 
 
