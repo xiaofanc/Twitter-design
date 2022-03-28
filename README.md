@@ -380,6 +380,27 @@ python manage.py migrate
 ``` 
 
 #### Comment API
+Define serializers under comments/api/:
+```
+class CommentSerializer(serializers.ModelSerializer):
+......
+class CommentCreateSerializer(serializers.ModelSerializer):
+......
+```
+
+Update `comments/api/serializers.py` and `comments/api/views.py` to implement create API
+
+Updates of URL Configuration in `twitter/urls.py`:
+```
+router.register(r'api/comments', CommentViewSet, basename = 'comments')
+```
+
+Runsever to test API in Chrome:
+* need to login first for create API
+```
+http://localhost/admin/
+http://localhost/api/comments/
+```
 
 #### Comment API Tests
 Add tests in `comments/tests.py` to test_comment:
