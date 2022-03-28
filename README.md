@@ -277,7 +277,7 @@ class Meta:
 Updates in `newsfeeds/admin.py`:
 register NewsfeedAdmin to admin
 
-Migrate to create the Friendship table in database:
+Migrate to create the Newsfeed table in database:
 ```
 python manage.py makemigrations
 python manage.py migrate
@@ -352,6 +352,39 @@ http://localhost/api/newsfeeds/
 Add tests in `newsfeeds/tests.py` to test_list:
 ```
 python manage.py test newsfeeds
+```
+
+### Comments & Likes
+#### Comment Model
+Create a comment component and move `views.py` to api folder: \
+`python manage.py startapp comments` 
+
+Updates in `twitter/settings.py`:
+* add `'comments'` in INSTALLED_APPS 
+
+Define Comments model in `comments/models.py`
+* table: `user, tweet, content, created_at, updated_at`, `user` represents who create the `comment`
+* add composite key 
+```
+class Meta:
+    index_together = (('user', 'created_at'),)
+```
+
+Updates in `comments/admin.py`:
+register CommentAdmin to admin
+
+Migrate to create the Comment table in database:
+```
+python manage.py makemigrations
+python manage.py migrate
+``` 
+
+#### Comment API
+
+#### Comment API Tests
+Add tests in `comments/tests.py` to test_comment:
+```
+python manage.py test comments
 ```
 
 ### Documentation
