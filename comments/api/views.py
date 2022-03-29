@@ -33,7 +33,7 @@ class CommentViewSet(viewsets.GenericViewSet):
         # comments = Comment.objects.filter(tweet_id = tweet_id)
         # if django-filter is installed
         queryset = self.get_queryset()
-        comments = self.filter_queryset(queryset).order_by('created_at')
+        comments = self.filter_queryset(queryset).prefetch_related('user').order_by('created_at')
         serializer = CommentSerializer(comments, many=True)
         return Response(
             {'comments': serializer.data},
