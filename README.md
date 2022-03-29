@@ -393,9 +393,6 @@ class CommentUpdateSerializer(serializers.ModelSerializer):
 Update `comments/api/serializers.py` and `comments/api/views.py` to implement create, update, destroy, list API:
 * update and destroy need to check if object.user == request.user
 
-Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API:
-* retrieve comments for a tweet
-
 Updates of URL Configuration in `twitter/urls.py`:
 ```
 router.register(r'api/comments', CommentViewSet, basename = 'comments')
@@ -411,6 +408,11 @@ Runsever to test API in Chrome:
 http://localhost/admin/
 http://localhost/api/comments/
 http://localhost/api/comments/?tweet_id=1
+```
+
+Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API:
+* retrieve comments for a tweet
+```
 http://localhost/api/tweets/1
 ```
 
