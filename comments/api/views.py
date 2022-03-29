@@ -4,6 +4,7 @@ from comments.models import Comment
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from comments.api.serializers import CommentSerializer, CommentCreateSerializer, CommentUpdateSerializer
 from comments.api.permissions import IsObjectOwner
+from utils.decorators import required_params
 
 # Create your views here.
 
@@ -22,13 +23,9 @@ class CommentViewSet(viewsets.GenericViewSet):
         return [AllowAny()]
 
     # GET /api/comments/?tweet_id = 1 -> list
+    @required_params(params=['tweet_id'])
     def list(self, request, *args, **kwargs):
         # list comments for a tweet
-        if 'tweet_id' not in request.query_params:
-            return Response({
-                    'message': 'missing tweet_id in request',
-                    'success': False,
-                },status=status.HTTP_400_BAD_REQUEST,)
         # tweet_id = request.query_params['tweet_id']
         # comments = Comment.objects.filter(tweet_id = tweet_id)
         # if django-filter is installed
