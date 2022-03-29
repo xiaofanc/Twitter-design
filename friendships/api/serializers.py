@@ -19,7 +19,7 @@ class FriendCreateSerializer(serializers.ModelSerializer):
                 'message': 'from_user_id and to_user_id should be different'
             })
 
-        if not User.objecs.filter(id = attrs['to_user_id']).exists():
+        if not User.objects.filter(id = attrs['to_user_id']).exists():
             raise ValidationError({
                 'message': 'user does not exist.'
             })
