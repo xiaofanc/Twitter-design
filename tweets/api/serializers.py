@@ -1,5 +1,8 @@
+from xml.etree.ElementTree import Comment
+from attr import fields
 from rest_framework import serializers
 from accounts.api.serializers import UserSerializer
+from comments.api.serializers import CommentSerializer
 from tweets.models import Tweet
 
 class TweetSerializer(serializers.ModelSerializer):
@@ -8,7 +11,6 @@ class TweetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tweet
         fields = ('id', 'user', 'created_at', 'content')  # response
-    
 
 class TweetCreateSerializer(serializers.ModelSerializer):
     content = serializers.CharField(min_length=6, max_length=140)
@@ -23,3 +25,9 @@ class TweetCreateSerializer(serializers.ModelSerializer):
         tweet = Tweet.objects.create(user=user, content=content)
         return tweet
 
+class TweetSerializerWithComments(TweetSerializer):
+    comments = CommentSerializer(source='comment_set', many=True)
+
+    class Meta:
+        model = Tweet
+        fields = ('id', 'user', 'created_at', 'content', 'comments')

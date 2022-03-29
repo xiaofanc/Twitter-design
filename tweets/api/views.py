@@ -3,10 +3,12 @@ from newsfeeds.services import NewsFeedService
 from tweets.api.serializers import (
     TweetCreateSerializer, 
     TweetSerializer,
+    TweetSerializerWithComments,
 )
 from tweets.models import Tweet
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from utils.decorators import required_params
 
 class TweetViewSet(viewsets.GenericViewSet,
     viewsets.mixins.CreateModelMixin,
@@ -18,7 +20,7 @@ class TweetViewSet(viewsets.GenericViewSet,
     serializer_class = TweetCreateSerializer
 
     def get_permissions(self):
-        if self.action == 'list':
+        if self.action in ['list', 'retrieve']:
             return [AllowAny()]
         return [IsAuthenticated()]
     
@@ -46,13 +48,11 @@ class TweetViewSet(viewsets.GenericViewSet,
 
         return Response(TweetSerializer(tweet).data, status=201)
 
+    @required_params(params=['user_id'])
     def list(self, request, *args, **kwargs):
         """
         重载list方法，列出user_id下的所有tweets
         """
-        if 'user_id' not in request.query_params:
-            return Response('missing user_id', status=400)
-        
         # 用到联合索引 ('user_id', 'created_at')
         tweets = Tweet.objects.filter(
             user_id = request.query_params['user_id']
@@ -61,3 +61,9 @@ class TweetViewSet(viewsets.GenericViewSet,
 
         # 调用 serializer.data 会获得包含多个推文的一个列表对象
         return Response({'tweets': serializer.data})
+    
+    # GET /api/tweets/1/
+    def retrieve(self, request, *args, **kwargs):
+        # retrieve comments for tweet
+        tweet = self.get_object()
+        return Response(TweetSerializerWithComments(tweet).data)

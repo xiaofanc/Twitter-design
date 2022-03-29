@@ -390,8 +390,11 @@ class CommentUpdateSerializer(serializers.ModelSerializer):
 ......
 ```
 
-Update `comments/api/serializers.py` and `comments/api/views.py` to implement create, update, destroy API:
+Update `comments/api/serializers.py` and `comments/api/views.py` to implement create, update, destroy, list API:
 * update and destroy need to check if object.user == request.user
+
+Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API:
+* retrieve comments for a tweet
 
 Updates of URL Configuration in `twitter/urls.py`:
 ```
@@ -407,11 +410,12 @@ Runsever to test API in Chrome:
 ```
 http://localhost/admin/
 http://localhost/api/comments/
-http://localhost:8000/api/comments/?tweet_id=1
+http://localhost/api/comments/?tweet_id=1
+http://localhost/api/tweets/1
 ```
 
 #### Comment API Tests
-Add tests in `comments/tests.py` to test_comment:
+Add tests in `comments/tests.py` to test_create, test_destroy, test_update and test_list:
 ```
 python manage.py test comments
 ```
