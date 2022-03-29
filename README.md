@@ -410,16 +410,16 @@ http://localhost/api/comments/
 http://localhost/api/comments/?tweet_id=1
 ```
 
-Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API:
-* retrieve comments for a tweet
-```
-http://localhost/api/tweets/1
-```
-
 #### Comment API Tests
 Add tests in `comments/tests.py` to test_create, test_destroy, test_update and test_list:
 ```
 python manage.py test comments
+```
+
+Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API:
+* retrieve comments for a tweet
+```
+http://localhost/api/tweets/1
 ```
 
 ### Documentation
