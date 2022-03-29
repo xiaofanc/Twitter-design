@@ -421,8 +421,8 @@ python manage.py test comments/api
 ```
 
 #### Add retrieve API for Tweets
-Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API and create tests in `tweets/api/tests.py`:
-* retrieve comments for a tweet
+Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API and create tests in `tweets/api/tests.py`:\
+retrieve comments for a tweet
 ```
 http://localhost/api/tweets/1
 ```
@@ -488,6 +488,12 @@ Add tests in `likes/api/tests.py` to test_create, test_cancel:
 ```
 python manage.py test likes/api
 ```
+
+#### Retrieve likes for Comment or Tweet
+* add a service has_liked in `likes/service.py`
+* update `serializers.py` for Comment and Tweet: add likes_count or comments_count
+* add test_comments_count testcase in `comments/api/tests.py`
+* add test_likes_in_comments_api and test_likes_in_tweets_api in `likes/api/tests.py`
 
 ### Documentation
 #### Migration

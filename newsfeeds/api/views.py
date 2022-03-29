@@ -1,3 +1,4 @@
+from multiprocessing import context
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from newsfeeds.api.serializers import NewsFeedSerializer
@@ -12,7 +13,11 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
         return Newsfeed.objects.filter(user=self.request.user)
 
     def list(self, request):
-        serializer = NewsFeedSerializer(self.get_queryset(), many=True)
+        serializer = NewsFeedSerializer(
+            self.get_queryset(),
+            context={'request': request},
+            many=True
+        )
         return Response({
             'newsfeeds': serializer.data,
         }, status=200)

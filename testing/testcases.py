@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from comments.models import Comment
 from tweets.models import Tweet
 from likes.models import Like
+from newsfeeds.models import Newsfeed
 from django.contrib.contenttypes.models import ContentType
 
 class TestCase(DjangoTestCase):
@@ -45,3 +46,6 @@ class TestCase(DjangoTestCase):
         client = APIClient()
         client.force_authenticate(user)
         return user, client
+
+    def create_newsfeed(self, user, tweet):
+        return Newsfeed.objects.create(user=user, tweet=tweet)

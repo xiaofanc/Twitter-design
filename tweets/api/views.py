@@ -1,9 +1,10 @@
+from multiprocessing import context
 from rest_framework import viewsets
 from newsfeeds.services import NewsFeedService
 from tweets.api.serializers import (
     TweetCreateSerializer, 
     TweetSerializer,
-    TweetSerializerWithComments,
+    TweetSerializerForDetail,
 )
 from tweets.models import Tweet
 from rest_framework.response import Response
@@ -46,7 +47,10 @@ class TweetViewSet(viewsets.GenericViewSet,
         # 增加发推文的时候，自动把推文加到newsfeed
         NewsFeedService.fanout_to_followers(tweet)
 
-        return Response(TweetSerializer(tweet).data, status=201)
+        return Response(
+            TweetSerializer(tweet, context={'request':request}).data, 
+            status=201
+        )
 
     @required_params(params=['user_id'])
     def list(self, request, *args, **kwargs):
@@ -57,7 +61,11 @@ class TweetViewSet(viewsets.GenericViewSet,
         tweets = Tweet.objects.filter(
             user_id = request.query_params['user_id']
         ).order_by('-created_at')
-        serializer = TweetSerializer(tweets, many=True)
+        serializer = TweetSerializer(
+            tweets,
+            context={'request':request},
+            many=True
+            )
 
         # 调用 serializer.data 会获得包含多个推文的一个列表对象
         return Response({'tweets': serializer.data})
@@ -66,4 +74,5 @@ class TweetViewSet(viewsets.GenericViewSet,
     def retrieve(self, request, *args, **kwargs):
         # retrieve comments for tweet
         tweet = self.get_object()
-        return Response(TweetSerializerWithComments(tweet).data)
+        serializer = TweetSerializerForDetail(tweet, context={'request':request},)
+        return Response(serializer.data)
