@@ -10,6 +10,7 @@ from comments.api.permissions import IsObjectOwner
 class CommentViewSet(viewsets.GenericViewSet):
     serializer_class = CommentCreateSerializer
     queryset = Comment.objects.all()
+    filterset_fields = ('tweet_id',)
 
     def get_permissions(self):
         # 注意要加用 AllowAny() / IsAuthenticated() 实例化出对象
@@ -20,6 +21,26 @@ class CommentViewSet(viewsets.GenericViewSet):
             return [IsAuthenticated(), IsObjectOwner()]
         return [AllowAny()]
 
+    # GET /api/comments/?tweet_id = 1 -> list
+    def list(self, request, *args, **kwargs):
+        # list comments for a tweet
+        if 'tweet_id' not in request.query_params:
+            return Response({
+                    'message': 'missing tweet_id in request',
+                    'success': False,
+                },status=status.HTTP_400_BAD_REQUEST,)
+        # tweet_id = request.query_params['tweet_id']
+        # comments = Comment.objects.filter(tweet_id = tweet_id)
+        # if django-filter is installed
+        queryset = self.get_queryset()
+        comments = self.filter_queryset(queryset).order_by('created_at')
+        serializer = CommentSerializer(comments, many=True)
+        return Response(
+            {'comments': serializer.data},
+            status=status.HTTP_200_OK,
+        )
+    
+    # POST /api/comments/ -> create
     def create(self, request, *args, **kwargs):
         data = {
             'user_id': request.user.id,
@@ -41,7 +62,8 @@ class CommentViewSet(viewsets.GenericViewSet):
             CommentSerializer(comment).data,
             status=status.HTTP_201_CREATED,
         )
-
+    
+    # PUT /api/comments/1/ -> update
     def update(self, request, *args, **kwargs):
         # get_object 是 DRF 包装的一个函数，会在找不到的时候 raise 404 error
         # instance is for update
@@ -62,6 +84,7 @@ class CommentViewSet(viewsets.GenericViewSet):
             status=status.HTTP_200_OK,
         )
 
+    # DELETE /api/comments/1/ -> destroy
     def destroy(self, request, *args, **kwargs):
         comment = self.get_object()
         comment.delete()

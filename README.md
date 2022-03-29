@@ -398,11 +398,16 @@ Updates of URL Configuration in `twitter/urls.py`:
 router.register(r'api/comments', CommentViewSet, basename = 'comments')
 ```
 
+Updates in `twitter/settings.py` (for comment list API):
+* add `'django_filters'` in INSTALLED_APPS
+* add `'DEFAULT_FILTER_BACKENDS'` in REST_FRAMEWORK
+
 Runsever to test API in Chrome:
 * need to login first for create, update, destroy API
 ```
 http://localhost/admin/
 http://localhost/api/comments/
+http://localhost:8000/api/comments/?tweet_id=1
 ```
 
 #### Comment API Tests
