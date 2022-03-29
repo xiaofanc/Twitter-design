@@ -386,9 +386,12 @@ class CommentSerializer(serializers.ModelSerializer):
 ......
 class CommentCreateSerializer(serializers.ModelSerializer):
 ......
+class CommentUpdateSerializer(serializers.ModelSerializer):
+......
 ```
 
-Update `comments/api/serializers.py` and `comments/api/views.py` to implement create API
+Update `comments/api/serializers.py` and `comments/api/views.py` to implement create, update, destroy API:
+* update and destroy need to check if object.user == request.user
 
 Updates of URL Configuration in `twitter/urls.py`:
 ```
@@ -396,7 +399,7 @@ router.register(r'api/comments', CommentViewSet, basename = 'comments')
 ```
 
 Runsever to test API in Chrome:
-* need to login first for create API
+* need to login first for create, update, destroy API
 ```
 http://localhost/admin/
 http://localhost/api/comments/
