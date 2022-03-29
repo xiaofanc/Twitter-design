@@ -187,9 +187,10 @@ http://localhost/api/tweets/?user_id=1
 Create a class TestCase for all of the testing in a new folder testing: 
 * generate create_user and create_tweet method 
 
-Add tests in `tweets/tests.py` to test_hours_to_now, test_list_api and test_create_api:
+Add tests in `tweets/tests.py` to test_hours_to_now and tests in `tweets/api/test/py` to test_list_api and test_create_api:
 ```
 python manage.py test tweets
+python manage.py test tweets/api
 ```
 
 ### Design Friendship Model, API & Tests
@@ -379,6 +380,9 @@ python manage.py makemigrations
 python manage.py migrate
 ``` 
 
+Updates in `testing/testcases.py`:
+* add create_comment in testcases
+
 #### Comment API
 Define serializers under comments/api/:
 ```
@@ -411,17 +415,50 @@ http://localhost/api/comments/?tweet_id=1
 ```
 
 #### Comment API Tests
-Add tests in `comments/tests.py` to test_create, test_destroy, test_update and test_list:
+Add tests in `comments/api/tests.py` to test_create, test_destroy, test_update and test_list:
 ```
-python manage.py test comments
+python manage.py test comments/api
 ```
 
 #### Add retrieve API for Tweets
-Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API:
+Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API and create tests in `tweets/api/tests.py`:
 * retrieve comments for a tweet
 ```
 http://localhost/api/tweets/1
 ```
+
+### Design Like Model, API & Tests
+#### Like Model
+design model to like comment or tweet \
+Create a comment component and move `views.py` to api folder: \
+`python manage.py startapp likes` 
+
+Updates in `twitter/settings.py`:
+* add `'likes'` in INSTALLED_APPS 
+
+Define Likes model in `likes/models.py`
+* table: `user, object_id, content_type, content_object, created_at`
+* add composite key and unique key
+```
+class Meta:
+    unique_together = (('user', 'content_type', 'object_id'),)
+    index_together = (('content_type', 'object_id', 'created_at'),)
+```
+
+Updates in `likes/admin.py`:
+register LikeAdmin to admin
+
+Migrate to create the Like table in database:
+```
+python manage.py makemigrations
+python manage.py migrate
+``` 
+
+Testing:
+* add create_like in `testing/testcases.py`
+* add like_set property in `comments/models.py` and add testcase in `comments/tests.py`
+* add like_set property in `tweets/models.py` and add testcase in `tweets/tests.py`
+
 
 ### Documentation
 #### Migration
