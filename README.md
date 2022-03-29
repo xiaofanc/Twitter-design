@@ -354,7 +354,7 @@ Add tests in `newsfeeds/tests.py` to test_list:
 python manage.py test newsfeeds
 ```
 
-### Comments & Likes
+### Design Comment Model, API & Tests
 #### Comment Model
 Create a comment component and move `views.py` to api folder: \
 `python manage.py startapp comments` 
@@ -416,6 +416,7 @@ Add tests in `comments/tests.py` to test_create, test_destroy, test_update and t
 python manage.py test comments
 ```
 
+#### Add retrieve API for Tweets
 Update `tweets/api/serializers.py` and `tweets/api/views.py` to implement retrieve API:
 * retrieve comments for a tweet
 ```
