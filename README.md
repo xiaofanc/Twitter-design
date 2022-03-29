@@ -459,6 +459,34 @@ Testing:
 * add like_set property in `comments/models.py` and add testcase in `comments/tests.py`
 * add like_set property in `tweets/models.py` and add testcase in `tweets/tests.py`
 
+#### Like API
+Define serializers under comments/api/:
+```
+class LikeSerializer(serializers.ModelSerializer):
+......
+class LikeCreateSerializer(serializers.ModelSerializer):
+......
+```
+
+Update `likes/api/serializers.py` and `likes/api/views.py` to implement create API
+
+Updates of URL Configuration in `twitter/urls.py`:
+```
+router.register(r'api/likes', LikeViewSet, basename = 'likes')
+```
+
+Runsever to test API in Chrome:
+* need to login first for create API
+```
+http://localhost/admin/
+http://localhost/api/likes/
+```
+
+#### Like API Tests
+Add tests in `likes/api/tests.py` to test_create:
+```
+python manage.py test likes/api
+```
 
 ### Documentation
 #### Migration
