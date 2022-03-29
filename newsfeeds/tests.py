@@ -11,8 +11,6 @@ FOLLOW_URL = '/api/friendships/{}/follow/'
 class NewsFeedApiTests(TestCase):
 
     def setUp(self):
-        self.anonymous_client = APIClient()
-
         self.user1 = self.create_user('user1', 'user1@twitter.com')
         self.user1_client = APIClient()
         self.user1_client.force_authenticate(self.user1)
