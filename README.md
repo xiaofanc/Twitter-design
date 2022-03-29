@@ -468,7 +468,7 @@ class LikeCreateSerializer(serializers.ModelSerializer):
 ......
 ```
 
-Update `likes/api/serializers.py` and `likes/api/views.py` to implement create API
+Update `likes/api/serializers.py` and `likes/api/views.py` to implement create, cancel API
 
 Updates of URL Configuration in `twitter/urls.py`:
 ```
@@ -476,14 +476,15 @@ router.register(r'api/likes', LikeViewSet, basename = 'likes')
 ```
 
 Runsever to test API in Chrome:
-* need to login first for create API
+* need to login first for create, cancel API
 ```
 http://localhost/admin/
 http://localhost/api/likes/
+http://localhost/api/likes/cancel
 ```
 
 #### Like API Tests
-Add tests in `likes/api/tests.py` to test_create:
+Add tests in `likes/api/tests.py` to test_create, test_cancel:
 ```
 python manage.py test likes/api
 ```
