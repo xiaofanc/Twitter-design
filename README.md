@@ -497,6 +497,25 @@ python manage.py test likes/api
 
 
 ### Notification
+Install the packages
+```
+pip install django-storages   # support AWS S3
+pip install boto3                    # S3相关接口
+pip freeze > requirements.txt
+```
+#### Notification service
+Create a notification component and move `views.py` to api folder: \
+The third package is called notifications so we use inbox here \
+`python manage.py startapp inbox`   
+
+Updates in `twitter/settings.py`:
+* add `'notifications'` in INSTALLED_APPS 
+
+Add `services.py` in inbox and create send_like_notifications and send_comment_notifications.
+
+Update Likes and Comments API to send notifications when creating.
+
+#### Notification API
 
 ### Documentation
 #### Migration
