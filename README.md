@@ -495,7 +495,7 @@ python manage.py test likes/api
 * add test_comments_count testcase in `comments/api/tests.py`
 * add test_likes_in_comments_api and test_likes_in_tweets_api in `likes/api/tests.py`
 
-
+\
 ### Design Notification Model, API & Tests
 Install the packages to get model
 ```
