@@ -495,7 +495,6 @@ python manage.py test likes/api
 * add test_comments_count testcase in `comments/api/tests.py`
 * add test_likes_in_comments_api and test_likes_in_tweets_api in `likes/api/tests.py`
 
-\
 ### Design Notification Model, API & Tests
 Install the packages to get model
 ```
@@ -521,8 +520,7 @@ Add `services.py` in inbox and create send_like_notifications and send_comment_n
 Update Likes and Comments API to send notifications when creating
 
 #### Notification API
-Define Notification serializer in `inbox/api/serializers.py` \
-Update `inbox/api/views.py` to create unread_count, mark_all_as_read API \
+Define Notification serializer `inbox/api/serializers.py` and update `inbox/api/views.py` to create unread_count, mark_all_as_read API \
 Add tests in `inbox/api/tests.py` to test APIs
 
 Migrate to create the Notification table in database:
