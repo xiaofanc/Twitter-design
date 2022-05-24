@@ -511,13 +511,27 @@ The third package is called notifications so we use inbox here \
 Updates in `twitter/settings.py`:
 * add `'notifications'` in INSTALLED_APPS 
 
+Updates of URL Configuration in `twitter/urls.py`:
+```
+router.register(r'api/notifications', NotificationViewSet, basename='notifications')
+```
+
 Add `services.py` in inbox and create send_like_notifications and send_comment_notifications
 
 Update Likes and Comments API to send notifications when creating
 
 #### Notification API
+Define Notification serializer in `inbox/api/serializers.py` \
+Update `inbox/api/views.py` to create unread_count, mark_all_as_read API \
+Add tests in `inbox/api/tests.py` to test APIs
 
+Migrate to create the Notification table in database:
+```
+python manage.py makemigrations
+python manage.py migrate
+``` 
 
+Update notification
 
 ### Documentation
 #### Migration
