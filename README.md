@@ -520,7 +520,7 @@ Add `services.py` in inbox and create send_like_notifications and send_comment_n
 Update Likes and Comments API to send notifications when creating
 
 #### Notification API
-Define Notification serializer `inbox/api/serializers.py` and update `inbox/api/views.py` to create unread_count, mark_all_as_read API \
+Define Notification serializer `inbox/api/serializers.py` and update `inbox/api/views.py` to create unread_count, mark_all_as_read, update API \
 Add tests in `inbox/api/tests.py` to test APIs
 
 Migrate to create the Notification table in database:
@@ -529,7 +529,6 @@ python manage.py makemigrations
 python manage.py migrate
 ``` 
 
-Update notification
 
 ### Documentation
 #### Migration
