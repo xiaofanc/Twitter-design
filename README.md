@@ -507,9 +507,8 @@ Create a notification component and move `views.py` to api folder: \
 The third package is called notifications so we use inbox here \
 `python manage.py startapp inbox`   
 
-Updates in `twitter/settings.py`:
-* add `'notifications'` in INSTALLED_APPS 
-
+Updates in `twitter/settings.py`: add `'notifications'` in INSTALLED_APPS \
+<br/>
 Updates of URL Configuration in `twitter/urls.py`:
 ```
 router.register(r'api/notifications', NotificationViewSet, basename='notifications')
