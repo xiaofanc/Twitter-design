@@ -429,7 +429,7 @@ http://localhost/api/tweets/1
 
 ### Design Like Model, API & Tests
 #### Like Model
-Design model to like comment or tweet 
+Design model to like comment or tweet \
 <br/>
 Create a comment component and move `views.py` to api folder: \
 `python manage.py startapp likes` 
@@ -522,6 +522,7 @@ Update Likes and Comments API to send notifications when creating
 
 #### Notification API
 Define Notification serializer `inbox/api/serializers.py` and update `inbox/api/views.py` to create unread_count, mark_all_as_read, update API \
+<br/>
 Add tests in `inbox/api/tests.py` to test APIs
 
 Migrate to create the Notification table in database:
