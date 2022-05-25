@@ -502,7 +502,7 @@ Install the packages to get model
 pip install django-notifications-hq
 pip freeze > requirements.txt
 ```
-<br\>
+<br/>
 #### Notification service
 Create a notification component and move `views.py` to api folder: \
 The third package is called notifications so we use inbox here \
