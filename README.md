@@ -574,7 +574,9 @@ router.register(r'api/profiles', UserProfileViewSet, basename='profiles')
 ```
 
 ### Design Tweet Photo model, API & Tests
-Update `tweet/admin.py`, `tweet/models.py` and `tweet/tests.py` for TweetPhoto model
+Update `tweets/admin.py`, `tweets/models.py` and `tweets/tests.py` for TweetPhoto model\
+<br/>
+Update `tweets/api/serializers.py`, `tweets/api/tests.py` and add `tweets/services.py` to create tweets with files
 
 ### Documentation
 #### Migration
