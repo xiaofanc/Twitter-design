@@ -499,8 +499,7 @@ python manage.py test likes/api
 ### Design Notification Model, API & Tests
 Install the packages to get model
 ```
-pip install django-storages   # support AWS S3
-pip install boto3                    # S3相关接口
+pip install django-notifications-hq
 pip freeze > requirements.txt
 ```
 #### Notification service
@@ -543,7 +542,30 @@ class UserProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 ```
 
-### 
+### Amazon S3 to store avatar images
+Install packages:
+```
+pip install django-storages   # support AWS S3
+pip install boto3                    # S3相关接口
+pip freeze > requirements.txt
+```
+
+Update `twitter/settings.py` for connecting Amazon S3:
+```
+MEDIA_ROOT = 'media/'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+TESTING = ((" ".join(sys.argv)).find('manage.py test') != -1)
+if TESTING:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+AWS_STORAGE_BUCKET_NAME = 'django-twitter'
+AWS_S3_REGION_NAME = 'us-west-1'
+```
+
+Update `twitter/local_settings.py` to store AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+
+
 ### Documentation
 #### Migration
 Migration is used to update the tables:
