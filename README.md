@@ -573,6 +573,9 @@ Update URL Configuration in `twitter/urls.py`:
 router.register(r'api/profiles', UserProfileViewSet, basename='profiles')
 ```
 
+### Design Tweet Photo model, API & Tests
+Update `tweet/admin.py`, `tweet/models.py` and `tweet/tests.py` for TweetPhoto model
+
 ### Documentation
 #### Migration
 Migration is used to update the tables:
