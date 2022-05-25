@@ -429,7 +429,8 @@ http://localhost/api/tweets/1
 
 ### Design Like Model, API & Tests
 #### Like Model
-design model to like comment or tweet \
+Design model to like comment or tweet \
+<br/>
 Create a comment component and move `views.py` to api folder: \
 `python manage.py startapp likes` 
 
@@ -541,7 +542,7 @@ class UserProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 ```
 
-
+### 
 ### Documentation
 #### Migration
 Migration is used to update the tables:
