@@ -429,7 +429,7 @@ http://localhost/api/tweets/1
 
 ### Design Like Model, API & Tests
 #### Like Model
-Design model to like comment or tweet \
+Design model to like comment or tweet 
 <br/>
 Create a comment component and move `views.py` to api folder: \
 `python manage.py startapp likes` 
