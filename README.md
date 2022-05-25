@@ -529,6 +529,18 @@ python manage.py makemigrations
 python manage.py migrate
 ``` 
 
+### Design User Profile
+* update `accounts/models.py`, `accounts/admin.py` and tests to create user profile model
+* add property of get_profile for user model to get user profile for user
+```
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+    avatar = models.FileField(null=True)
+    nickname = models.CharField(null=True, max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+```
+
 
 ### Documentation
 #### Migration

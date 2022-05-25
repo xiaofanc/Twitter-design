@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from rest_framework import exceptions
 
+
 class UserSerializer(serializers.ModelSerializer):
     """
     control the output of your responses
@@ -10,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email']
 
+
 class UserSerializerForFriendship(serializers.ModelSerializer):
     """
     control the output of your responses
@@ -17,6 +19,7 @@ class UserSerializerForFriendship(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username']
+
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -29,7 +32,7 @@ class LoginSerializer(serializers.Serializer):
                 'username': 'User does not exist.'
             })
         data['username'] = username
-        return data 
+        return data
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -65,4 +68,7 @@ class SignupSerializer(serializers.ModelSerializer):
             email=email,
             password=password,
         )
+
+        user.profile
+
         return user
