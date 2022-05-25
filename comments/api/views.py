@@ -4,11 +4,12 @@ from rest_framework.response import Response
 from comments.models import Comment
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from comments.api.serializers import CommentSerializer, CommentCreateSerializer, CommentUpdateSerializer
-from comments.api.permissions import IsObjectOwner
+from utils.permissions import IsObjectOwner
 from inbox.services import NotificationService
 from utils.decorators import required_params
 
 # Create your views here.
+
 
 class CommentViewSet(viewsets.GenericViewSet):
     serializer_class = CommentCreateSerializer
@@ -32,17 +33,18 @@ class CommentViewSet(viewsets.GenericViewSet):
         # comments = Comment.objects.filter(tweet_id = tweet_id)
         # if django-filter is installed
         queryset = self.get_queryset()
-        comments = self.filter_queryset(queryset).prefetch_related('user').order_by('created_at')
+        comments = self.filter_queryset(queryset).prefetch_related(
+            'user').order_by('created_at')
         serializer = CommentSerializer(
             comments,
-            context={'request':request}, 
+            context={'request': request},
             many=True,
         )
         return Response(
             {'comments': serializer.data},
             status=status.HTTP_200_OK,
         )
-    
+
     # POST /api/comments/ -> create
     def create(self, request, *args, **kwargs):
         data = {
@@ -62,12 +64,12 @@ class CommentViewSet(viewsets.GenericViewSet):
         # save 方法会触发 serializer 里的 create 方法，点进 save 的具体实现里可以看到
         comment = serializer.save()
         NotificationService.send_comment_notification(comment)
-        serializer = CommentSerializer(comment, context={'request':request}, )
+        serializer = CommentSerializer(comment, context={'request': request}, )
         return Response(
             serializer.data,
             status=status.HTTP_201_CREATED,
         )
-    
+
     # PUT /api/comments/1/ -> update
     def update(self, request, *args, **kwargs):
         # get_object 是 DRF 包装的一个函数，会在找不到的时候 raise 404 error
@@ -84,7 +86,7 @@ class CommentViewSet(viewsets.GenericViewSet):
         # save 方法会触发 serializer 里的 update 方法，点进 save 的具体实现里可以看到
         # save 是根据 instance 参数有没有传来决定是触发 create 还是 update
         comment = serializer.save()
-        serializer = CommentSerializer(comment, context={'request':request}, )
+        serializer = CommentSerializer(comment, context={'request': request}, )
         return Response(
             serializer.data,
             status=status.HTTP_200_OK,

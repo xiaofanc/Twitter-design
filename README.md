@@ -542,7 +542,7 @@ class UserProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 ```
 
-### Amazon S3 to store avatar images
+#### Amazon S3 to store avatar images
 Install packages:
 ```
 pip install django-storages   # support AWS S3
@@ -563,8 +563,16 @@ AWS_STORAGE_BUCKET_NAME = 'django-twitter'
 AWS_S3_REGION_NAME = 'us-west-1'
 ```
 
-Update `twitter/local_settings.py` to store AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+Update `twitter/local_settings.py` to store AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY \
+<br/>
+Update `accounts/api/serializers.py` to add user profile for serializers \
+<br/>
+Update `accounts/api/tests.py` to test update user profile update API
 
+Updates of URL Configuration in `twitter/urls.py`:
+```
+router.register(r'api/profiles', UserProfileViewSet, basename='profiles')
+```
 
 ### Documentation
 #### Migration
