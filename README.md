@@ -567,7 +567,7 @@ Update `twitter/local_settings.py` to store AWS_ACCESS_KEY_ID and AWS_SECRET_ACC
 <br/>
 Update `accounts/api/serializers.py` to add user profile for serializers \
 <br/>
-Update `accounts/api/tests.py` to test update user profile API
+Update `accounts/api/tests.py` to test update user profile API \
 <br/>
 Update URL Configuration in `twitter/urls.py`:
 ```
