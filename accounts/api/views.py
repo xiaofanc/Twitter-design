@@ -2,9 +2,11 @@ from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework import permissions
 from accounts.api.serializers import (
-    UserSerializer, 
+    UserProfileSerializerForUpdate,
+    UserSerializer,
     LoginSerializer,
-    SignupSerializer
+    SignupSerializer,
+    UserSerializerWithProfile
 )
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -12,7 +14,11 @@ from django.contrib.auth import (
     login as django_login,
     logout as django_logout,
     authenticate as django_authenticate
-    )
+)
+
+from accounts.models import UserProfile
+from utils.permissions import IsObjectOwner
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -20,8 +26,9 @@ class UserViewSet(viewsets.ModelViewSet):
     ModelViewSet includes list, retrieve, put, patch, destroy
     """
     queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated] # login before create user?
+    serializer_class = UserSerializerWithProfile
+    permission_classes = [permissions.IsAdminUser]
+
 
 class AccountViewSet(viewsets.ViewSet):
     # detail=False: general action for accounts
@@ -51,7 +58,7 @@ class AccountViewSet(viewsets.ViewSet):
                 "success": False,
                 "message": "Please check input",
                 "errors": serializer.errors,
-                }, status=400)
+            }, status=400)
 
         # validation ok, login
         username = serializer.validated_data["username"]
@@ -74,31 +81,27 @@ class AccountViewSet(viewsets.ViewSet):
         })
 
     @action(methods=['POST'], detail=False)
-    def signup(self, request):        
+    def signup(self, request):
         serializer = SignupSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({
                 "success": False,
                 "message": "Please check input",
                 "errors": serializer.errors,
-                }, status=400) 
-        
-        user = serializer.save()      
+            }, status=400)
+
+        user = serializer.save()
         django_login(request, user)
         return Response({
             'success': True,
             'user': UserSerializer(user).data,
-        }, status=201) 
+        }, status=201)
 
 
-
-
-
-
-
-
-
-
-
-
-
+class UserProfileViewSet(
+    viewsets.GenericViewSet,
+    viewsets.mixins.UpdateModelMixin,
+):
+    queryset = UserProfile
+    permission_classes = (permissions.IsAuthenticated, IsObjectOwner,)
+    serializer_class = UserProfileSerializerForUpdate
