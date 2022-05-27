@@ -9,10 +9,12 @@ from friendships.api.serializers import (
     FriendCreateSerializer,
 )
 from friendships.models import Friendship
+from friendships.api.paginations import FriendshipPagination
 
 class FriendshipViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = FriendCreateSerializer
+    pagination_class = FriendshipPagination
 
     # get all followers for user_id = pk, pk is in the URL
     # detail = True will call get_object() method to get queryset and check if queryset.filter(pk=1) exists
@@ -21,21 +23,19 @@ class FriendshipViewSet(viewsets.GenericViewSet):
     @action(methods=['GET'], detail=True, permission_classes=[AllowAny])
     def followers(self, request, pk):
         friendships = Friendship.objects.filter(to_user_id=pk).order_by('-created_at')
-        serializer = FollowerSerializer(friendships, many=True)
-        return Response(
-            {'followers': serializer.data},
-            status=200,
-        )
+        page = self.paginate_queryset(friendships)
+        serializer = FollowerSerializer(
+            page, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     # get all followers for user_id = pk
     @action(methods=['GET'], detail=True, permission_classes=[AllowAny])
     def followings(self, request, pk):
         friendships = Friendship.objects.filter(from_user_id=pk).order_by('-created_at')
-        serializer = FollowingSerializer(friendships, many=True)
-        return Response(
-            {'followings': serializer.data},
-            status=200,
-        )
+        page = self.paginate_queryset(friendships)
+        serializer = FollowingSerializer(
+            page, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     # login user follow user_id = pk
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
@@ -67,8 +67,10 @@ class FriendshipViewSet(viewsets.GenericViewSet):
                 'errors': serializer.errors
             }, status=400)
         
-        serializer.save()
-        return Response({'success': True}, status=201)
+        instance = serializer.save()
+        return Response(FollowingSerializer(
+            instance, context={'request': request}).data, 
+            status=201)
 
     # login user unfollow user_id = pk
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
