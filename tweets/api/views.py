@@ -10,6 +10,7 @@ from tweets.models import Tweet
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from utils.decorators import required_params
+from utils.paginations import EndlessPagination
 
 class TweetViewSet(viewsets.GenericViewSet,
     viewsets.mixins.CreateModelMixin,
@@ -19,6 +20,7 @@ class TweetViewSet(viewsets.GenericViewSet,
     """
     queryset = Tweet.objects.all()
     serializer_class = TweetCreateSerializer
+    pagination_class = EndlessPagination
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -58,9 +60,10 @@ class TweetViewSet(viewsets.GenericViewSet,
         重载list方法，列出user_id下的所有tweets
         """
         # 用到联合索引 ('user_id', 'created_at')
-        tweets = Tweet.objects.filter(
-            user_id = request.query_params['user_id']
-        ).order_by('-created_at')
+        tweets = Tweet.objects.filter(user_id = request.query_params['user_id']).order_by('-created_at')
+
+        tweets = self.paginate_queryset(tweets)
+
         serializer = TweetSerializer(
             tweets,
             context={'request':request},
@@ -68,7 +71,7 @@ class TweetViewSet(viewsets.GenericViewSet,
             )
 
         # 调用 serializer.data 会获得包含多个推文的一个列表对象
-        return Response({'tweets': serializer.data})
+        return self.get_paginated_response(serializer.data)
     
     # GET /api/tweets/1/
     def retrieve(self, request, *args, **kwargs):
