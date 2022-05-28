@@ -578,6 +578,20 @@ Update `tweets/admin.py`, `tweets/models.py` and `tweets/tests.py` for TweetPhot
 <br/>
 Update `tweets/api/serializers.py`, `tweets/api/tests.py` and add `tweets/services.py` to create tweets with files
 
+### Pagination
+#### page number pagination:
+page number pagination for friendships:
+* add FriendshipPagination class in `friendships/api/paginations.py`
+* update paginations for get followers and get followings in `friendships/api/views.py`
+* add has_followed method field in FollowerSerializer and FollowingSerializer in `friendships/api/serializers.py` 
+* update and add tests
+
+#### endless pagination:
+endless pagination for tweets:
+* add EndlessPagination class in `utils/paginations.py`
+* update tweets list API in `tweets/api/views.py`
+* update and add tests
+
 ### Documentation
 #### Migration
 Migration is used to update the tables:
@@ -608,20 +622,6 @@ explain select * from django_migrations where name="0001_initial";
 create index django_migrations_name_idx on django_migrations(name);
 ```
 possible_keys = possible_index, key = index
-
-### Pagination
-#### page number pagination:
-page number pagination for friendships:
-* add FriendshipPagination class in `friendships/api/paginations.py`
-* update paginations for get followers and get followings in `friendships/api/views.py`
-* add has_followed method field in FollowerSerializer and FollowingSerializer in `friendships/api/serializers.py` 
-* update and add tests
-
-#### endless pagination:
-endless pagination for tweets:
-* add EndlessPagination class in `utils/paginations.py`
-* update tweets list API in `tweets/api/views.py`
-* update and add tests
 
 #### Warning: 
 Newly added features must have `null=True` in order to avoid crashing the server. i.e. `email = models.EmailField(null=True)`\
