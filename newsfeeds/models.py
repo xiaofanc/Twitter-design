@@ -2,6 +2,8 @@ from enum import unique
 from django.db import models
 from django.contrib.auth.models import User
 from tweets.models import Tweet
+from utils.memcached_helper import MemcachedHelper
+
 
 class Newsfeed(models.Model):
     user = models.ForeignKey(
@@ -23,3 +25,7 @@ class Newsfeed(models.Model):
     
     def __str__(self):
         return f'{self.user} receive: {self.tweet.content} from {self.tweet.user} at {self.created_at}'
+    
+    @property
+    def cached_tweet(self):
+        return MemcachedHelper.get_object_through_cache(Tweet, self.tweet_id)
