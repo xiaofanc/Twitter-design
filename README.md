@@ -592,6 +592,16 @@ endless pagination for tweets/newsfeeds:
 * update list API in for tweets and newsfeed in `views.py`
 * update and add tests
 
+### Memcached
+Install Memcached: 
+```
+sudo apt-get install memcached  # ubuntu install memcached
+pip install python-memcached
+```
+
+
+
+
 ### Documentation
 #### Migration
 Migration is used to update the tables:
