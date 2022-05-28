@@ -1,23 +1,23 @@
-from multiprocessing import context
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from newsfeeds.api.serializers import NewsFeedSerializer
 from newsfeeds.models import Newsfeed
-from rest_framework.response import Response
+from utils.paginations import EndlessPagination
 
 class NewsFeedViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
+    pagination_class = EndlessPagination
 
     # 只能看当前user=当前登录用户的newsfeed
     def get_queryset(self):
         return Newsfeed.objects.filter(user=self.request.user)
 
     def list(self, request):
+        queryset = Newsfeed.objects.filter(user=self.request.user)
+        page = self.paginate_queryset(queryset)
         serializer = NewsFeedSerializer(
-            self.get_queryset(),
+            page,
             context={'request': request},
             many=True
         )
-        return Response({
-            'newsfeeds': serializer.data,
-        }, status=200)
+        return self.get_paginated_response(serializer.data)
