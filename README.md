@@ -587,9 +587,9 @@ page number pagination for friendships:
 * update and add tests
 
 #### endless pagination:
-endless pagination for tweets:
+endless pagination for tweets/newsfeeds:
 * add EndlessPagination class in `utils/paginations.py`
-* update tweets list API in `tweets/api/views.py`
+* update list API in for tweets and newsfeed in `views.py`
 * update and add tests
 
 ### Documentation
