@@ -1,7 +1,7 @@
 from xml.etree.ElementTree import Comment
 from attr import fields
 from rest_framework import serializers
-from accounts.api.serializers import UserSerializer
+from accounts.api.serializers import UserSerializerForTweet
 from comments.api.serializers import CommentSerializer
 from tweets.constants import TWEET_PHOTOS_UPLOAD_LIMIT
 from tweets.models import Tweet
@@ -11,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 from tweets.services import TweetService
 
 class TweetSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializerForTweet(source='cached_user')
     has_liked = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
     likes_count = serializers.SerializerMethodField()

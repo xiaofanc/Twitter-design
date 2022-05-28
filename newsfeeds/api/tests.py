@@ -11,6 +11,7 @@ FOLLOW_URL = '/api/friendships/{}/follow/'
 class NewsFeedApiTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         self.user1 = self.create_user('user1', 'user1@twitter.com')
         self.user1_client = APIClient()
         self.user1_client.force_authenticate(self.user1)
@@ -19,6 +20,14 @@ class NewsFeedApiTests(TestCase):
         self.user2_client = APIClient()
         self.user2_client.force_authenticate(self.user2)
 
+        self.linghu = self.create_user('linghu')
+        self.linghu_client = APIClient()
+        self.linghu_client.force_authenticate(self.linghu)
+
+        self.dongxie = self.create_user('dongxie')
+        self.dongxie_client = APIClient()
+        self.dongxie_client.force_authenticate(self.dongxie)
+        
         # create followings and followers for user2
         for i in range(2):
             follower = self.create_user('user2_follower{}'.format(i), 'user2_follower{i}@twitter.com')
@@ -108,3 +117,32 @@ class NewsFeedApiTests(TestCase):
         self.assertEqual(response.data['has_next_page'], False)
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['results'][0]['id'], new_newsfeed.id)
+
+    def test_user_cache(self):
+        profile = self.dongxie.profile
+        profile.nickname = 'huanglaoxie'
+        profile.save()
+
+        self.assertEqual(self.linghu.username, 'linghu')
+        self.create_newsfeed(self.dongxie, self.create_tweet(self.linghu))
+        self.create_newsfeed(self.dongxie, self.create_tweet(self.dongxie))
+
+        response = self.dongxie_client.get(NEWSFEEDS_URL)
+        results = response.data['results']
+        self.assertEqual(results[0]['tweet']['user']['username'], 'dongxie')
+        self.assertEqual(results[0]['tweet']['user']
+                         ['nickname'], 'huanglaoxie')
+        self.assertEqual(results[1]['tweet']['user']['username'], 'linghu')
+
+        self.linghu.username = 'linghuchong'
+        self.linghu.save()
+        profile.nickname = 'huangyaoshi'
+        profile.save()
+
+        response = self.dongxie_client.get(NEWSFEEDS_URL)
+        results = response.data['results']
+        self.assertEqual(results[0]['tweet']['user']['username'], 'dongxie')
+        self.assertEqual(results[0]['tweet']['user']
+                         ['nickname'], 'huangyaoshi')
+        self.assertEqual(results[1]['tweet']['user']
+                         ['username'], 'linghuchong')
