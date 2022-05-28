@@ -604,6 +604,16 @@ Memcached for friendships:
 * add invalidate_following_cache in service to delete key from cache if new following is added or deleted, delete from cache to avoid data inconsistency
 * user django listener to monitor the change of friendships model to invalidate_following_cache
 
+Memcached for users:
+* add get_user_through_cache, invalidate_user, get_profile_through_cache, invalidate_profile in services.py
+* add listener.py to monitor user model and user_profile model
+* update all files which used user in serializer to use user data from cache
+Add clear cache for all test files
+
+Memcached for tweets:
+* create a memcached_helper and listeners in utils and update all models.py which used cached user
+* add cached_tweet property in newsfeeds/models.py, update newsfeeds serializer and add listener in tweet model to monitor the updates of tweet
+
 
 ### Documentation
 #### Migration
