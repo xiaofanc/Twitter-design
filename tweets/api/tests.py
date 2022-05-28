@@ -12,6 +12,7 @@ TWEET_RETRIEVE_API = '/api/tweets/{}/'
 class TweetApiTests(TestCase):
 
     def setUp(self):
+        self.clear_cache()
         # 没有登录的用户不可以发推文，但是可以查看别人的推文。所以需要匿名（未登录）用户和注册（登录）用户。
         self.user1 = self.create_user('user1','user1@twitter.com')
         self.tweet1 = [self.create_tweet(self.user1) for i in range(3)]
