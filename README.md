@@ -600,7 +600,7 @@ pip install python-memcached
 ```
 
 Memcached for friendships:
-* add get_following_user_id_set in cache
+* add get_following_user_id_set from cache in service
 * add invalidate_following_cache in service to delete key from cache if new following is added or deleted, delete from cache to avoid data inconsistency
 * user django listener to monitor the change of friendships model to invalidate_following_cache
 
