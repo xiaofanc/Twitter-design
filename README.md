@@ -632,13 +632,15 @@ Set up Redis:
 Redis for tweets:
 * create class method push_tweet_to_cache, get_cached_tweets in `tweets/services.py`
 * add `utils/redis_helper.py` to support load_objects and push_object in Redis 
-* update `tweets/api/views.py` to get tweets from Redis for list API 
-* add `tweets/listeners.py` to add tweets to Redis when a tweet is created 
+* update `tweets/api/views.py` to get cached tweets from Redis for list API 
+* add `tweets/listeners.py` and update `tweets/models.py` to add tweets to Redis when a tweet is created 
 * update `utils/paginations.py` for paginate_ordered_list 
 * add tests in `tweets/tests.py`
 
 Redis for newsfeeds:
-
+* create class method get_cached_newsfeeds, push_newsfeed_to_cache in `newsfeeds/services.py`
+* update `newsfeeds/api/views.py` to get cached newsfeeds from Redis for list API 
+* add `newsfeeds/listeners.py` and update `newsfeeds/models.py` to add newsfeeds to Redis when a newsfeeds is created
 
 
 ### Documentation
