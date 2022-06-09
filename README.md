@@ -615,18 +615,27 @@ Memcached for tweets:
 * add cached_tweet property in `newsfeeds/models.py`, update newsfeeds `serializers.py` and connect listener in tweet model to monitor the updates of tweet
 
 ### Redis
-Install redis:
+Install Redis:
 ```
 sudo apt-get install redis
 pip install redis
 pip freeze > requirements.txt
 ```
 
-Add redis host, port and db `twitter/settings.py` \
-Create a Redis client for connection in utils \
-Serialize and deserialize tweet object for Redis using json encoder \
-* update json encoder for microsecond time
-Update `tweets/tests.py` and add `utils/tests.py`
+Set up Redis:
+* add redis host, port and db `twitter/settings.py` \
+* create a Redis client for connection in utils \
+* create serialize and deserialize for redis using json encoder \
+* update json encoder for microsecond time \
+* add tests in `tweets/tests.py` and `utils/tests.py`
+
+Redis for tweets:
+* create class method push_tweet_to_cache, get_cached_tweets in `tweets/services.py`\
+* add `utils/redis_helper.py` to support load_objects and push_object in Redis \
+* update `tweets/api/views.py` to get tweets from Redis for list API \
+* add `tweets/listeners.py` to add tweets to Redis when a tweet is created \
+* update `utils/paginations.py` for paginate_ordered_list \
+* add tests in `tweets/tests.py`
 
 
 

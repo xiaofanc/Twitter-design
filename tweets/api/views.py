@@ -9,6 +9,7 @@ from tweets.api.serializers import (
 from tweets.models import Tweet
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from tweets.services import TweetService
 from utils.decorators import required_params
 from utils.paginations import EndlessPagination
 
@@ -60,7 +61,9 @@ class TweetViewSet(viewsets.GenericViewSet,
         重载list方法，列出user_id下的所有tweets
         """
         # 用到联合索引 ('user_id', 'created_at')
-        tweets = Tweet.objects.filter(user_id = request.query_params['user_id']).order_by('-created_at')
+        # tweets = Tweet.objects.filter(user_id = request.query_params['user_id']).order_by('-created_at')
+        tweets = TweetService.get_cached_tweets(
+            user_id=request.query_params['user_id'])
 
         tweets = self.paginate_queryset(tweets)
 

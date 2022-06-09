@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from tweets.constants import TWEET_PHOTO_STATUS_CHOICES, TweetPhotoStatus
+from tweets.listeners import push_tweet_to_cache
 from utils.listeners import invalidate_object_cache
 from utils.memcached_helper import MemcachedHelper
 from utils.time_helpers import utc_now
@@ -79,3 +80,4 @@ class TweetPhoto(models.Model):
 
 post_save.connect(invalidate_object_cache, sender=Tweet)
 pre_delete.connect(invalidate_object_cache, sender=Tweet)
+post_save.connect(push_tweet_to_cache, sender=Tweet)
