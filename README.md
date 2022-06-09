@@ -623,20 +623,21 @@ pip freeze > requirements.txt
 ```
 
 Set up Redis:
-* add redis host, port and db `twitter/settings.py` \
-* create a Redis client for connection in utils \
-* create serialize and deserialize for redis using json encoder \
-* update json encoder for microsecond time \
+* add redis host, port and db `twitter/settings.py` 
+* create a Redis client for connection in utils 
+* create serialize and deserialize for redis using json encoder 
+* update json encoder for microsecond time 
 * add tests in `tweets/tests.py` and `utils/tests.py`
 
 Redis for tweets:
-* create class method push_tweet_to_cache, get_cached_tweets in `tweets/services.py`\
-* add `utils/redis_helper.py` to support load_objects and push_object in Redis \
-* update `tweets/api/views.py` to get tweets from Redis for list API \
-* add `tweets/listeners.py` to add tweets to Redis when a tweet is created \
-* update `utils/paginations.py` for paginate_ordered_list \
+* create class method push_tweet_to_cache, get_cached_tweets in `tweets/services.py`
+* add `utils/redis_helper.py` to support load_objects and push_object in Redis 
+* update `tweets/api/views.py` to get tweets from Redis for list API 
+* add `tweets/listeners.py` to add tweets to Redis when a tweet is created 
+* update `utils/paginations.py` for paginate_ordered_list 
 * add tests in `tweets/tests.py`
 
+Redis for newsfeeds:
 
 
 
