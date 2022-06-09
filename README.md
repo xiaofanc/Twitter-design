@@ -614,6 +614,22 @@ Memcached for tweets:
 * create a `memcached_helper.py` and `listeners.py` in utils and update all `models.py` which used cached user
 * add cached_tweet property in `newsfeeds/models.py`, update newsfeeds `serializers.py` and connect listener in tweet model to monitor the updates of tweet
 
+### Redis
+Install redis:
+```
+sudo apt-get install redis
+pip install redis
+pip freeze > requirements.txt
+```
+
+Add redis host, port and db `twitter/settings.py` \
+Create a Redis client for connection in utils \
+Serialize and deserialize tweet object for Redis using json encoder \
+* update json encoder for microsecond time
+Update `tweets/tests.py` and add `utils/tests.py`
+
+
+
 
 ### Documentation
 #### Migration
