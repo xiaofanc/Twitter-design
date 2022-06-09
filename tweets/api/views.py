@@ -62,13 +62,17 @@ class TweetViewSet(viewsets.GenericViewSet,
         """
         # 用到联合索引 ('user_id', 'created_at')
         # tweets = Tweet.objects.filter(user_id = request.query_params['user_id']).order_by('-created_at')
-        tweets = TweetService.get_cached_tweets(
-            user_id=request.query_params['user_id'])
+        user_id = request.query_params['user_id']
+        cached_tweets = TweetService.get_cached_tweets(user_id)
+        page = self.paginator.paginate_cached_list(cached_tweets, request)
 
-        tweets = self.paginate_queryset(tweets)
+        if page is None:
+            queryset = Tweet.objects.filter(
+                user_id=user_id).order_by('-created_at')
+            page = self.paginate_queryset(queryset)
 
         serializer = TweetSerializer(
-            tweets,
+            page,
             context={'request':request},
             many=True
             )

@@ -2,6 +2,7 @@ from django.test import TestCase as DjangoTestCase
 from rest_framework.test import APIClient
 from django.contrib.auth.models import User
 from comments.models import Comment
+from friendships.models import Friendship
 from tweets.models import Tweet
 from likes.models import Like
 from newsfeeds.models import Newsfeed
@@ -55,3 +56,6 @@ class TestCase(DjangoTestCase):
 
     def create_newsfeed(self, user, tweet):
         return Newsfeed.objects.create(user=user, tweet=tweet)
+
+    def create_friendship(self, from_user, to_user):
+        return Friendship.objects.create(from_user=from_user, to_user=to_user)

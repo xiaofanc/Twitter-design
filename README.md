@@ -642,6 +642,10 @@ Redis for newsfeeds:
 * update `newsfeeds/api/views.py` to get cached newsfeeds from Redis for list API 
 * add `newsfeeds/listeners.py` and update `newsfeeds/models.py` to add newsfeeds to Redis when a newsfeeds is created
 
+cache with limited size:
+* update `twitter/settings.py`, `utils/paginations.py` and `utils/redis_helper.py` to make the Redis only store limited size data
+* update `newsfeeds/api/views.py` and `tweets/api/views.py` for list API to get data from Redis first, if not enough data then check database
+* add tests in `newsfeeds/api/tests.py`
 
 ### Documentation
 #### Migration

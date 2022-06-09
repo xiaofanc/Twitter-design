@@ -9,14 +9,15 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
     pagination_class = EndlessPagination
 
-    # 只能看当前user=当前登录用户的newsfeed
-    def get_queryset(self):
-        return Newsfeed.objects.filter(user=self.request.user)
-
     def list(self, request):
         # queryset = Newsfeed.objects.filter(user=self.request.user)
-        queryset = NewsFeedService.get_cached_newsfeeds(request.user.id)
-        page = self.paginate_queryset(queryset)
+        cached_newsfeeds = NewsFeedService.get_cached_newsfeeds(
+            request.user.id)
+        page = self.paginator.paginate_cached_list(cached_newsfeeds, request)
+        # data is not in the cache
+        if page is None:
+            queryset = Newsfeed.objects.filter(user=request.user)
+            page = self.paginate_queryset(queryset)
         serializer = NewsFeedSerializer(
             page,
             context={'request': request},

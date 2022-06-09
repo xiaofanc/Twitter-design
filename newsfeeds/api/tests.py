@@ -1,7 +1,11 @@
+from django.conf import settings
 from friendships.models import Friendship
+from newsfeeds.models import Newsfeed
+from newsfeeds.services import NewsFeedService
 from rest_framework.test import APIClient
 from testing.testcases import TestCase
 from utils.paginations import EndlessPagination
+
 
 NEWSFEEDS_URL = '/api/newsfeeds/'
 POST_TWEETS_URL = '/api/tweets/'
@@ -12,14 +16,6 @@ class NewsFeedApiTests(TestCase):
 
     def setUp(self):
         self.clear_cache()
-        self.user1 = self.create_user('user1', 'user1@twitter.com')
-        self.user1_client = APIClient()
-        self.user1_client.force_authenticate(self.user1)
-
-        self.user2 = self.create_user('user2', 'user2@twitter.com')
-        self.user2_client = APIClient()
-        self.user2_client.force_authenticate(self.user2)
-
         self.linghu = self.create_user('linghu')
         self.linghu_client = APIClient()
         self.linghu_client.force_authenticate(self.linghu)
@@ -27,37 +23,38 @@ class NewsFeedApiTests(TestCase):
         self.dongxie = self.create_user('dongxie')
         self.dongxie_client = APIClient()
         self.dongxie_client.force_authenticate(self.dongxie)
-        
-        # create followings and followers for user2
+
+        # create followings and followers for dongxie
         for i in range(2):
-            follower = self.create_user('user2_follower{}'.format(i), 'user2_follower{i}@twitter.com')
-            Friendship.objects.create(from_user=follower, to_user=self.user2)
+            follower = self.create_user('dongxie_follower{}'.format(i))
+            Friendship.objects.create(from_user=follower, to_user=self.dongxie)
         for i in range(3):
-            following = self.create_user('user2_following{}'.format(i), 'user2_following{i}@twitter.com')
-            Friendship.objects.create(from_user=self.user2, to_user=following)
+            following = self.create_user('dongxie_following{}'.format(i))
+            Friendship.objects.create(
+                from_user=self.dongxie, to_user=following)
 
     def test_list(self):
         # 需要登录
         response = self.anonymous_client.get(NEWSFEEDS_URL)
         self.assertEqual(response.status_code, 403)
         # 不能用 post
-        response = self.user1_client.post(NEWSFEEDS_URL)
+        response = self.linghu_client.post(NEWSFEEDS_URL)
         self.assertEqual(response.status_code, 405)
         # 一开始啥都没有
-        response = self.user1_client.get(NEWSFEEDS_URL)
+        response = self.linghu_client.get(NEWSFEEDS_URL)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 0)
         # 自己发的信息是可以看到的
-        self.user1_client.post(POST_TWEETS_URL, {'content': 'Hello World'})
-        response = self.user1_client.get(NEWSFEEDS_URL)
+        self.linghu_client.post(POST_TWEETS_URL, {'content': 'Hello World'})
+        response = self.linghu_client.get(NEWSFEEDS_URL)
         self.assertEqual(len(response.data['results']), 1)
         # 关注之后可以看到别人发的
-        self.user1_client.post(FOLLOW_URL.format(self.user2.id))
-        response = self.user2_client.post(POST_TWEETS_URL, {
+        self.linghu_client.post(FOLLOW_URL.format(self.dongxie.id))
+        response = self.dongxie_client.post(POST_TWEETS_URL, {
             'content': 'Hello Twitter',
         })
         posted_tweet_id = response.data['id']
-        response = self.user1_client.get(NEWSFEEDS_URL)
+        response = self.linghu_client.get(NEWSFEEDS_URL)
         self.assertEqual(len(response.data['results']), 2)
         self.assertEqual(response.data['results']
                          [0]['tweet']['id'], posted_tweet_id)
@@ -68,13 +65,13 @@ class NewsFeedApiTests(TestCase):
         newsfeeds = []
         for i in range(page_size * 2):
             tweet = self.create_tweet(followed_user)
-            newsfeed = self.create_newsfeed(user=self.user1, tweet=tweet)
+            newsfeed = self.create_newsfeed(user=self.linghu, tweet=tweet)
             newsfeeds.append(newsfeed)
 
         newsfeeds = newsfeeds[::-1]
 
         # pull the first page
-        response = self.user1_client.get(NEWSFEEDS_URL)
+        response = self.linghu_client.get(NEWSFEEDS_URL)
         self.assertEqual(response.data['has_next_page'], True)
         self.assertEqual(len(response.data['results']), page_size)
         self.assertEqual(response.data['results'][0]['id'], newsfeeds[0].id)
@@ -85,7 +82,7 @@ class NewsFeedApiTests(TestCase):
         )
 
         # pull the second page
-        response = self.user1_client.get(
+        response = self.linghu_client.get(
             NEWSFEEDS_URL,
             {'created_at__lt': newsfeeds[page_size - 1].created_at},
         )
@@ -100,7 +97,7 @@ class NewsFeedApiTests(TestCase):
         )
 
         # pull latest newsfeeds
-        response = self.user1_client.get(
+        response = self.linghu_client.get(
             NEWSFEEDS_URL,
             {'created_at__gt': newsfeeds[0].created_at},
         )
@@ -108,9 +105,9 @@ class NewsFeedApiTests(TestCase):
         self.assertEqual(len(response.data['results']), 0)
 
         tweet = self.create_tweet(followed_user)
-        new_newsfeed = self.create_newsfeed(user=self.user1, tweet=tweet)
+        new_newsfeed = self.create_newsfeed(user=self.linghu, tweet=tweet)
 
-        response = self.user1_client.get(
+        response = self.linghu_client.get(
             NEWSFEEDS_URL,
             {'created_at__gt': newsfeeds[0].created_at},
         )
@@ -169,3 +166,55 @@ class NewsFeedApiTests(TestCase):
         response = self.dongxie_client.get(NEWSFEEDS_URL)
         results = response.data['results']
         self.assertEqual(results[0]['tweet']['content'], 'content2')
+
+    def _paginate_to_get_newsfeeds(self, client):
+        # paginate until the end
+        response = client.get(NEWSFEEDS_URL)
+        results = response.data['results']
+        while response.data['has_next_page']:
+            created_at__lt = response.data['results'][-1]['created_at']
+            response = client.get(
+                NEWSFEEDS_URL, {'created_at__lt': created_at__lt})
+            results.extend(response.data['results'])
+        return results
+
+    def test_redis_list_limit(self):
+        list_limit = settings.REDIS_LIST_LENGTH_LIMIT
+        page_size = EndlessPagination.page_size
+        users = [self.create_user('user{}'.format(i)) for i in range(5)]
+        newsfeeds = []
+        for i in range(list_limit + page_size):
+            tweet = self.create_tweet(
+                user=users[i % 5], content='feed{}'.format(i))
+            feed = self.create_newsfeed(self.linghu, tweet)
+            newsfeeds.append(feed)
+        newsfeeds = newsfeeds[::-1]
+
+        # only cached list_limit objects
+        cached_newsfeeds = NewsFeedService.get_cached_newsfeeds(self.linghu.id)
+        self.assertEqual(len(cached_newsfeeds), list_limit)
+        queryset = Newsfeed.objects.filter(user=self.linghu)
+        self.assertEqual(queryset.count(), list_limit + page_size)
+
+        results = self._paginate_to_get_newsfeeds(self.linghu_client)
+        self.assertEqual(len(results), list_limit + page_size)
+        for i in range(list_limit + page_size):
+            self.assertEqual(newsfeeds[i].id, results[i]['id'])
+
+        # a followed user create a new tweet
+        self.create_friendship(self.linghu, self.dongxie)
+        new_tweet = self.create_tweet(self.dongxie, 'a new tweet')
+        NewsFeedService.fanout_to_followers(new_tweet)
+
+        def _test_newsfeeds_after_new_feed_pushed():
+            results = self._paginate_to_get_newsfeeds(self.linghu_client)
+            self.assertEqual(len(results), list_limit + page_size + 1)
+            self.assertEqual(results[0]['tweet']['id'], new_tweet.id)
+            for i in range(list_limit + page_size):
+                self.assertEqual(newsfeeds[i].id, results[i + 1]['id'])
+
+        _test_newsfeeds_after_new_feed_pushed()
+
+        # cache expired
+        self.clear_cache()
+        _test_newsfeeds_after_new_feed_pushed()
