@@ -33,7 +33,7 @@ class FriendshipApiTests(TestCase):
 
         # 需要登录才能 follow 别人
         response = self.anonymous_client.post(url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         # 要用 get 来 follow
         response = self.user2_client.get(url)
         self.assertEqual(response.status_code, 405)
@@ -58,7 +58,7 @@ class FriendshipApiTests(TestCase):
 
         # 需要登录才能 unfollow 别人
         response = self.anonymous_client.post(url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         # 不能用 get 来 unfollow 别人
         response = self.user2_client.get(url)
         self.assertEqual(response.status_code, 405)

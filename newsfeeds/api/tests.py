@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.test import override_settings
 from friendships.models import Friendship
 from newsfeeds.models import Newsfeed
 from newsfeeds.services import NewsFeedService
@@ -12,6 +13,7 @@ POST_TWEETS_URL = '/api/tweets/'
 FOLLOW_URL = '/api/friendships/{}/follow/'
 
 
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class NewsFeedApiTests(TestCase):
 
     def setUp(self):
@@ -36,7 +38,7 @@ class NewsFeedApiTests(TestCase):
     def test_list(self):
         # 需要登录
         response = self.anonymous_client.get(NEWSFEEDS_URL)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         # 不能用 post
         response = self.linghu_client.post(NEWSFEEDS_URL)
         self.assertEqual(response.status_code, 405)
@@ -72,7 +74,7 @@ class NewsFeedApiTests(TestCase):
 
         # pull the first page
         response = self.linghu_client.get(NEWSFEEDS_URL)
-        self.assertEqual(response.data['has_next_page'], True)
+        self.assertEqual(response.data['next'] is not None, True)
         self.assertEqual(len(response.data['results']), page_size)
         self.assertEqual(response.data['results'][0]['id'], newsfeeds[0].id)
         self.assertEqual(response.data['results'][1]['id'], newsfeeds[1].id)
@@ -81,12 +83,13 @@ class NewsFeedApiTests(TestCase):
             newsfeeds[page_size - 1].id,
         )
 
-        # pull the second page
+        # pull the second page using cursor from first response
+        self.assertEqual(response.data['next'] is not None, True)
         response = self.linghu_client.get(
             NEWSFEEDS_URL,
-            {'created_at__lt': newsfeeds[page_size - 1].created_at},
+            {'cursor': response.data['next']},
         )
-        self.assertEqual(response.data['has_next_page'], False)
+        self.assertEqual(response.data['next'], None)
         results = response.data['results']
         self.assertEqual(len(results), page_size)
         self.assertEqual(results[0]['id'], newsfeeds[page_size].id)
@@ -101,7 +104,7 @@ class NewsFeedApiTests(TestCase):
             NEWSFEEDS_URL,
             {'created_at__gt': newsfeeds[0].created_at},
         )
-        self.assertEqual(response.data['has_next_page'], False)
+        self.assertEqual(response.data['next'], None)
         self.assertEqual(len(response.data['results']), 0)
 
         tweet = self.create_tweet(followed_user)
@@ -111,7 +114,7 @@ class NewsFeedApiTests(TestCase):
             NEWSFEEDS_URL,
             {'created_at__gt': newsfeeds[0].created_at},
         )
-        self.assertEqual(response.data['has_next_page'], False)
+        self.assertEqual(response.data['next'], None)
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['results'][0]['id'], new_newsfeed.id)
 
@@ -168,13 +171,11 @@ class NewsFeedApiTests(TestCase):
         self.assertEqual(results[0]['tweet']['content'], 'content2')
 
     def _paginate_to_get_newsfeeds(self, client):
-        # paginate until the end
+        # paginate until the end using cursor tokens
         response = client.get(NEWSFEEDS_URL)
         results = response.data['results']
-        while response.data['has_next_page']:
-            created_at__lt = response.data['results'][-1]['created_at']
-            response = client.get(
-                NEWSFEEDS_URL, {'created_at__lt': created_at__lt})
+        while response.data['next']:
+            response = client.get(NEWSFEEDS_URL, {'cursor': response.data['next']})
             results.extend(response.data['results'])
         return results
 

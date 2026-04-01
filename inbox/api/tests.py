@@ -94,7 +94,7 @@ class NotificationApiTests(TestCase):
 
         # 匿名用户无法访问 api
         response = self.anonymous_client.get(NOTIFICATION_URL)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         # dongxie 看不到任何 notifications
         response = self.dongxie_client.get(NOTIFICATION_URL)
         self.assertEqual(response.status_code, 200)
@@ -132,7 +132,7 @@ class NotificationApiTests(TestCase):
         self.assertEqual(response.status_code, 405)
         # 不可以被其他人改变 notification 状态
         response = self.anonymous_client.put(url, {'unread': False})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         # 因为 queryset 是按照当前登陆用户来，所以会返回 404 而不是 403
         response = self.dongxie_client.put(url, {'unread': False})
         self.assertEqual(response.status_code, 404)

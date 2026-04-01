@@ -25,7 +25,7 @@ class CommentApiTests(TestCase):
     def test_create(self):
         # 匿名不可以创建
         response = self.anonymous_client.post(COMMENT_URL)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
         # 啥参数都没带不行
         response = self.user1_client.post(COMMENT_URL)
@@ -65,7 +65,7 @@ class CommentApiTests(TestCase):
         # 匿名不可以删除
         response = self.anonymous_client.delete(url)
         # print(response.data)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
         # 非本人不能删除
         response = self.user2_client.delete(url)
@@ -86,7 +86,7 @@ class CommentApiTests(TestCase):
         # 匿名不可以更新
         response = self.anonymous_client.put(url, {'content': 'new'})
         # print(response.data)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         # 非本人不能更新
         response = self.user2_client.put(url, {'content': 'new'})
         self.assertEqual(response.status_code, 403)

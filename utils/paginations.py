@@ -1,3 +1,4 @@
+import base64
 from dateutil import parser
 from rest_framework.pagination import BasePagination
 from rest_framework.response import Response
@@ -14,10 +15,27 @@ class EndlessPagination(BasePagination):
     def to_html(self):
         pass
 
+    @staticmethod
+    def encode_cursor(dt):
+        """Encode a datetime to an opaque base64 cursor token."""
+        return base64.urlsafe_b64encode(
+            dt.isoformat().encode('utf-8')
+        ).decode('utf-8')
+
+    @staticmethod
+    def decode_cursor(cursor_str):
+        """Decode a cursor token back to a datetime, or None on failure."""
+        try:
+            return parser.isoparse(
+                base64.urlsafe_b64decode(cursor_str.encode('utf-8')).decode('utf-8')
+            )
+        except Exception:
+            return None
+
     def paginate_ordered_list(self, reverse_ordered_list, request):
         if 'created_at__gt' in request.query_params:
             created_at__gt = parser.isoparse(
-                request.query_params['created_at__gt']) # format to datetime
+                request.query_params['created_at__gt'])
             objects = []
             for obj in reverse_ordered_list:
                 if obj.created_at > created_at__gt:
@@ -28,38 +46,28 @@ class EndlessPagination(BasePagination):
             return objects
 
         index = 0
-        if 'created_at__lt' in request.query_params:
-            created_at__lt = parser.isoparse(
-                request.query_params['created_at__lt'])
-            for index, obj in enumerate(reverse_ordered_list):
-                if obj.created_at < created_at__lt:
-                    break
-            else:
-                # 没找到任何满足条件的 objects, 返回空数组
-                # 注意这个 else 对应的是 for，参见 python 的 for else 语法
-                reverse_ordered_list = []
+        if 'cursor' in request.query_params:
+            cursor_dt = self.decode_cursor(request.query_params['cursor'])
+            if cursor_dt:
+                for index, obj in enumerate(reverse_ordered_list):
+                    if obj.created_at < cursor_dt:
+                        break
+                else:
+                    reverse_ordered_list = []
         self.has_next_page = len(reverse_ordered_list) > index + self.page_size
         return reverse_ordered_list[index: index + self.page_size]
 
     def paginate_queryset(self, queryset, request, view=None):
         if 'created_at__gt' in request.query_params:
-            # created_at__gt 用于下拉刷新的时候加载最新的内容进来
-            # 为了简便起见，下拉刷新不做翻页机制，直接加载所有更新的数据
-            # 因为如果数据很久没有更新的话，不会采用下拉刷新的方式进行更新，而是重新加载最新的数据
             created_at__gt = request.query_params['created_at__gt']
             queryset = queryset.filter(created_at__gt=created_at__gt)
             self.has_next_page = False
             return queryset.order_by('-created_at')
 
-        if 'created_at__lt' in request.query_params:
-            # created_at__lt 用于向上滚屏（往下翻页）的时候加载下一页的数据
-            # 寻找 created_at < created_at__lt 的 objects 里按照 created_at 倒序的前
-            # page_size + 1 个 objects
-            # 比如目前的 created_at 列表是 [10, 9, 8, 7 .. 1] 如果 created_at__lt=10
-            # page_size = 2 则应该返回 [9, 8, 7]，多返回一个 object 的原因是为了判断是否
-            # 还有下一页从而减少一次空加载。
-            created_at__lt = request.query_params['created_at__lt']
-            queryset = queryset.filter(created_at__lt=created_at__lt)
+        if 'cursor' in request.query_params:
+            cursor_dt = self.decode_cursor(request.query_params['cursor'])
+            if cursor_dt:
+                queryset = queryset.filter(created_at__lt=cursor_dt)
 
         queryset = queryset.order_by('-created_at')[:self.page_size + 1]
         self.has_next_page = len(queryset) > self.page_size
@@ -67,20 +75,22 @@ class EndlessPagination(BasePagination):
 
     def paginate_cached_list(self, cached_list, request):
         paginated_list = self.paginate_ordered_list(cached_list, request)
-        # 如果是上翻页，paginated_list 里是所有的最新的数据，直接返回
         if 'created_at__gt' in request.query_params:
             return paginated_list
-        # 如果还有下一页，说明 cached_list 里的数据还没有取完，也直接返回
         if self.has_next_page:
             return paginated_list
-        # 如果 cached_list 的长度不足最大限制，说明 cached_list 里已经是所有数据了
         if len(cached_list) < settings.REDIS_LIST_LENGTH_LIMIT:
             return paginated_list
-        # 如果进入这里，说明可能存在在数据库里没有 load 在 cache 里的数据，需要直接去数据库查询
+        # Cache may be incomplete — fall back to DB
         return None
-        
+
     def get_paginated_response(self, data):
+        next_cursor = None
+        if self.has_next_page and data:
+            last_created_at = data[-1].get('created_at')
+            if last_created_at:
+                next_cursor = self.encode_cursor(parser.isoparse(str(last_created_at)))
         return Response({
-            'has_next_page': self.has_next_page,
+            'next': next_cursor,
             'results': data,
         })

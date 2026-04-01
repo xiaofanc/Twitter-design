@@ -22,7 +22,7 @@ class LikeApiTests(TestCase):
 
         # anonymous is not allowed
         response = self.anonymous_client.post(LIKE_BASE_URL, data)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
         # get is not allowed
         response = self.user1_client.get(LIKE_BASE_URL, data)
@@ -46,7 +46,7 @@ class LikeApiTests(TestCase):
 
         # anonymous is not allowed
         response = self.anonymous_client.post(LIKE_BASE_URL, data)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
         # get is not allowed
         response = self.user1_client.get(LIKE_BASE_URL, data)
@@ -92,7 +92,7 @@ class LikeApiTests(TestCase):
 
         # login required
         response = self.anonymous_client.post(LIKE_CANCEL_URL, like_comment_data)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
         # get is not allowed
         response = self.user1_client.get(LIKE_CANCEL_URL, like_comment_data)
