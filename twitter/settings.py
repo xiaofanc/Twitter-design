@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,13 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'bu996cjunyod_b^4p3p#=ggjv82=gtjt3dgmd=^0=u$1o!9k-a'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-insecure-key-do-not-use-in-prod')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', '192.168.56.10', 'localhost']
-INTERNAL_IPS = ['10.0.2.2']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+INTERNAL_IPS = ['10.0.2.2', '127.0.0.1']
 
 # Application definition
 
@@ -41,7 +42,6 @@ INSTALLED_APPS = [
     # third party packages
     'rest_framework',
     'django_filters',
-    'debug_toolbar',
     'notifications',
 
     # project apps
@@ -69,8 +69,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 ROOT_URLCONF = 'twitter.urls'
 
@@ -98,12 +101,12 @@ WSGI_APPLICATION = 'twitter.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'twitter',
-        'HOST': '0.0.0.0',
-        'PORT': '3306',
-        'USER': 'root',
-        'PASSWORD': 'yourpassword',    # 这里是自己下载mysql时候输入两次的那个密码
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'twitter'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'postgres'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -159,25 +162,43 @@ if TESTING:
 AWS_STORAGE_BUCKET_NAME = 'django-twitter-xc'
 AWS_S3_REGION_NAME = 'us-west-1'
 
+_USER_CACHE_BACKEND = os.environ.get('USER_CACHE_BACKEND', 'memcached')
+_MEMCACHED_LOCATION = os.environ.get('MEMCACHED_LOCATION', '127.0.0.1:11211')
+_USER_CACHE_REDIS_URL = os.environ.get('USER_CACHE_REDIS_URL', 'redis://127.0.0.1:6379/2')
+
+if _USER_CACHE_BACKEND == 'redis':
+    _cache_backend = 'django_redis.cache.RedisCache'
+    _cache_location = _USER_CACHE_REDIS_URL
+    _cache_options = {'CLIENT_CLASS': 'django_redis.client.DefaultClient'}
+else:
+    _cache_backend = 'django.core.cache.backends.memcached.MemcachedCache'
+    _cache_location = _MEMCACHED_LOCATION
+    _cache_options = {}
+
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+        'BACKEND': _cache_backend,
+        'LOCATION': _cache_location,
         'TIMEOUT': 86400,
+        'OPTIONS': _cache_options,
     },
     'testing': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+        'BACKEND': _cache_backend,
+        'LOCATION': _cache_location,
         'TIMEOUT': 86400,
         'KEY_PREFIX': 'testing',
+        'OPTIONS': _cache_options,
     },
 }
 
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = 6379
+REDIS_HOST = os.environ.get('REDIS_HOST', '127.0.0.1')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
 REDIS_DB = 0 if TESTING else 1
 REDIS_KEY_EXPIRE_TIME = 7 * 86400  # in seconds
 REDIS_LIST_LENGTH_LIMIT = 1000 if not TESTING else 20
+
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/3')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://127.0.0.1:6379/3')
 
 try:
     from .local_settings import *
