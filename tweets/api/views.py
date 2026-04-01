@@ -1,6 +1,6 @@
 from multiprocessing import context
 from rest_framework import viewsets
-from newsfeeds.services import NewsFeedService
+from newsfeeds.tasks import fanout_newsfeed_task
 from tweets.api.serializers import (
     TweetCreateSerializer, 
     TweetSerializer,
@@ -47,8 +47,9 @@ class TweetViewSet(viewsets.GenericViewSet,
         # save data to db
         tweet = serializer.save()
 
-        # 增加发推文的时候，自动把推文加到newsfeed
-        NewsFeedService.fanout_to_followers(tweet)
+        # Async fanout: Celery task inserts Newsfeed rows for all followers.
+        # Returns immediately — follower feeds are updated in the background.
+        fanout_newsfeed_task.delay(tweet.id)
 
         return Response(
             TweetSerializer(tweet, context={'request':request}).data, 

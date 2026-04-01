@@ -1,8 +1,7 @@
-from asyncio import constants
 from friendships.models import Friendship
 from django.core.cache import caches
 from django.conf import settings
-from twitter.cache import FOLLOWINGS_PATTERN
+from twitter.cache import FOLLOWINGS_PATTERN, FOLLOWERS_PATTERN
 
 cache = caches['testing'] if settings.TESTING else caches['default']
 
@@ -10,16 +9,22 @@ class FriendshipService(object):
 
     @classmethod
     def get_followers(cls, user):
-        # Filter Friendship table to get all from_user: 
-        # friendships = Friendship.objects.filter(to_user = user)
-        # follower_ids = [friendship.from_user_id for friendship in friendships]
-        # Based on the from_user to get user objects from User table
-        # followers = User.objects.filter(id__in = follower_ids)
-        # Return a list of user objects
+        key = FOLLOWERS_PATTERN.format(user_id=user.id)
+        followers = cache.get(key)
+        if followers is not None:
+            return followers
+
         friendships = Friendship.objects.filter(
-            to_user = user,
+            to_user=user,
         ).prefetch_related('from_user')
-        return [friendship.from_user for friendship in friendships]
+        followers = [friendship.from_user for friendship in friendships]
+        cache.set(key, followers)
+        return followers
+
+    @classmethod
+    def invalidate_followers_cache(cls, to_user_id):
+        key = FOLLOWERS_PATTERN.format(user_id=to_user_id)
+        cache.delete(key)
 
     @classmethod
     def has_followed(cls, from_user, to_user):

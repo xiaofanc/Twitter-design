@@ -14,8 +14,9 @@ class NewsFeedService(object):
             for follower in FriendshipService.get_followers(tweet.user)
         ]
         newsfeeds.append(Newsfeed(user = tweet.user, tweet = tweet))
-        # insert into the table using one SQL
-        Newsfeed.objects.bulk_create(newsfeeds)
+        # ignore_conflicts=True makes retries idempotent:
+        # the unique_together (user, tweet) constraint silently skips duplicates
+        Newsfeed.objects.bulk_create(newsfeeds, ignore_conflicts=True)
         # bulk create 不会触发 post_save 的 signal，所以需要手动 push 到 cache 里
         for newsfeed in newsfeeds:
             cls.push_newsfeed_to_cache(newsfeed)
