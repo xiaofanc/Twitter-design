@@ -202,5 +202,5 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://127.0.0
 
 try:
     from .local_settings import *
-except:
+except ImportError:
     pass
