@@ -24,8 +24,8 @@ botocore>=1.25
 s3transfer>=0.5
 jmespath>=0.10
 
-# Auth (to be added in Step 4)
-# djangorestframework-simplejwt
+# Auth
+djangorestframework-simplejwt==5.2.2
 
 # CORS (to be added in Step 9)
 # django-cors-headers

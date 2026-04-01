@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 from accounts.api.views import UserViewSet, AccountViewSet, UserProfileViewSet
 from comments.api.views import CommentViewSet
 from inbox.api.views import NotificationViewSet
@@ -43,6 +44,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
 ]
 
 if settings.DEBUG:

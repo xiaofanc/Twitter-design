@@ -15,9 +15,18 @@ from django.contrib.auth import (
     logout as django_logout,
     authenticate as django_authenticate
 )
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import UserProfile
 from utils.permissions import IsObjectOwner
+
+
+def _get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -46,6 +55,14 @@ class AccountViewSet(viewsets.ViewSet):
 
     @action(methods=['POST'], detail=False)
     def logout(self, request):
+        # Blacklist the refresh token if provided, then clear the session
+        refresh_token = request.data.get('refresh')
+        if refresh_token:
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            except Exception:
+                pass
         django_logout(request)
         return Response({'success': True})
 
@@ -75,9 +92,11 @@ class AccountViewSet(viewsets.ViewSet):
             }, status=400)
 
         django_login(request, user)
+        tokens = _get_tokens_for_user(user)
         return Response({
             "success": True,
             "user": UserSerializer(instance=user).data,
+            **tokens,
         })
 
     @action(methods=['POST'], detail=False)
@@ -92,9 +111,11 @@ class AccountViewSet(viewsets.ViewSet):
 
         user = serializer.save()
         django_login(request, user)
+        tokens = _get_tokens_for_user(user)
         return Response({
             'success': True,
             'user': UserSerializer(user).data,
+            **tokens,
         }, status=201)
 
 

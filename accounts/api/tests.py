@@ -57,16 +57,29 @@ class AccountApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.data['user'], None)
         self.assertEqual(response.data['user']['id'], self.user.id)
-        # 验证已经登录了
+        # verify JWT tokens are returned
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+        # 验证已经登录了 (session)
         response = self.client.get(LOGIN_STATUS_URL)
+        self.assertEqual(response.data['has_logged_in'], True)
+        # verify JWT Bearer token also authenticates
+        access_token = self.client.post(LOGIN_URL, {
+            'username': self.user.username,
+            'password': 'correct password',
+        }).data['access']
+        jwt_client = APIClient()
+        jwt_client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+        response = jwt_client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], True)
 
     def test_logout(self):
         # 先登录
-        self.client.post(LOGIN_URL, {
+        login_response = self.client.post(LOGIN_URL, {
             'username': self.user.username,
             'password': 'correct password',
         })
+        refresh_token = login_response.data['refresh']
         # 验证用户已经登录
         response = self.client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], True)
@@ -75,12 +88,15 @@ class AccountApiTests(TestCase):
         response = self.client.get(LOGOUT_URL)
         self.assertEqual(response.status_code, 405)
 
-        # 改用 post 成功 logout
-        response = self.client.post(LOGOUT_URL)
+        # 改用 post 成功 logout, blacklist the refresh token
+        response = self.client.post(LOGOUT_URL, {'refresh': refresh_token})
         self.assertEqual(response.status_code, 200)
-        # 验证用户已经登出
+        # 验证用户已经登出 (session cleared)
         response = self.client.get(LOGIN_STATUS_URL)
         self.assertEqual(response.data['has_logged_in'], False)
+        # verify blacklisted refresh token can no longer be used
+        response = self.client.post('/api/token/refresh/', {'refresh': refresh_token})
+        self.assertEqual(response.status_code, 401)
 
     def test_signup(self):
         data = {
@@ -123,6 +139,9 @@ class AccountApiTests(TestCase):
         response = self.client.post(SIGNUP_URL, data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['user']['username'], 'someone')
+        # verify JWT tokens are returned on signup
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
 
         # 验证user profile已被创建
         created_user_id = response.data['user']['id']
