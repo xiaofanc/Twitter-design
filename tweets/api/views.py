@@ -1,4 +1,4 @@
-from multiprocessing import context
+from django.db.models import prefetch_related_objects
 from rest_framework import viewsets
 from newsfeeds.tasks import fanout_newsfeed_task
 from tweets.api.serializers import (
@@ -71,6 +71,9 @@ class TweetViewSet(viewsets.GenericViewSet,
             queryset = Tweet.objects.filter(
                 user_id=user_id).order_by('-created_at')
             page = self.paginate_queryset(queryset)
+
+        # Batch prefetch to eliminate N+1 for likes, comments, photos
+        prefetch_related_objects(page, 'likes', 'comment_set', 'tweetphoto_set')
 
         serializer = TweetSerializer(
             page,

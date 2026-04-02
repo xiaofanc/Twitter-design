@@ -1,3 +1,4 @@
+from django.db.models import prefetch_related_objects
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from newsfeeds.api.serializers import NewsFeedSerializer
@@ -10,14 +11,14 @@ class NewsFeedViewSet(viewsets.GenericViewSet):
     pagination_class = EndlessPagination
 
     def list(self, request):
-        # queryset = Newsfeed.objects.filter(user=self.request.user)
-        cached_newsfeeds = NewsFeedService.get_cached_newsfeeds(
-            request.user.id)
+        cached_newsfeeds = NewsFeedService.get_cached_newsfeeds(request.user.id)
         page = self.paginator.paginate_cached_list(cached_newsfeeds, request)
-        # data is not in the cache
         if page is None:
             queryset = Newsfeed.objects.filter(user=request.user)
             page = self.paginate_queryset(queryset)
+        # Batch prefetch on tweets to eliminate N+1 for likes, comments, photos
+        tweets = [nf.cached_tweet for nf in page]
+        prefetch_related_objects(tweets, 'likes', 'comment_set', 'tweetphoto_set')
         serializer = NewsFeedSerializer(
             page,
             context={'request': request},
