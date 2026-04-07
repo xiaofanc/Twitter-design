@@ -1,0 +1,75 @@
+{
+  "stack": [
+    { "label": "Django 3.1 + DRF", "category": "backend" },
+    { "label": "PostgreSQL 14", "category": "backend" },
+    { "label": "Redis 7", "category": "backend" },
+    { "label": "Memcached (dev) / Redis db2 (prod)", "category": "backend" },
+    { "label": "Celery 5", "category": "backend" },
+    { "label": "Next.js 16 App Router", "category": "frontend" },
+    { "label": "TypeScript + Tailwind CSS 4", "category": "frontend" },
+    { "label": "SWR (cursor-based infinite scroll)", "category": "frontend" }
+  ],
+  "fanout": {
+    "title": "Fanout-on-Write Newsfeed",
+    "steps": [
+      "User posts tweet → Django creates Tweet row",
+      "Signal fires → fanout_newsfeed_task.delay(tweet_id) sent to Celery via Redis broker",
+      "Celery worker fetches followers from Memcached (FriendshipService.get_followers)",
+      "bulk_create() inserts Newsfeed rows for author + all followers (unique_together prevents duplicates on retry)",
+      "Worker manually pushes each Newsfeed to Redis list (bulk_create skips post_save signals)",
+      "Feed request → Redis list served in O(1), falls back to DB only when cache is cold or exhausted"
+    ],
+    "tradeoffs": [
+      "Fan-out on write means read is O(1) — ideal for read-heavy feeds",
+      "Celery task retries with exponential backoff (max 3) — idempotent via unique_together",
+      "Redis list capped at 1000 entries per user; older items served from DB"
+    ]
+  },
+  "caching": {
+    "title": "Two-Tier Caching",
+    "tiers": [
+      {
+        "name": "Object cache (Memcached in dev / Redis db2 in prod)",
+        "stores": "User, Tweet, Comment objects",
+        "key": "{ModelName}:{id}",
+        "ttl": "24 hours",
+        "invalidation": "Django post_save / pre_delete signals"
+      },
+      {
+        "name": "List cache (Redis db0)",
+        "stores": "Follower lists, following sets, newsfeed lists, user tweet lists",
+        "key": "newsfeeds:{user_id}, followers:{user_id}, user_tweets:{user_id}",
+        "ttl": "7 days",
+        "invalidation": "Signal handlers on follow/unfollow; manual push on new tweet"
+      }
+    ],
+    "devProdNote": "Memcached is dev-only — Railway has no managed Memcached. In prod, a second Redis logical DB (db2) replaces it. The /architecture page reflects the prod topology."
+  },
+  "pagination": {
+    "title": "Cursor Pagination",
+    "strategy": "Opaque base64-encoded created_at timestamp — stable under concurrent inserts, no page-drift.",
+    "params": {
+      "cursor": "base64(created_at ISO) — scroll forward (next page)",
+      "created_at__gt": "ISO datetime — pull-to-refresh (new items since last seen)"
+    },
+    "response": "{ next: <cursor | null>, results: [...] }",
+    "whyNotOffset": "Offset pagination drifts when new items are inserted during scroll — cursor encodes position in time, not row count."
+  },
+  "n1fixes": {
+    "title": "N+1 Query Elimination",
+    "before": "20 tweets × 3 relations (likes, comments, photos) = 60+ queries per feed page",
+    "after": "prefetch_related_objects(tweets, 'likes', 'comment_set', 'tweetphoto_set') → 3 batched queries regardless of page size",
+    "notes": [
+      "GenericRelation 'likes' added to Tweet model so Django ORM can batch-fetch likes",
+      "User objects served from Memcached (cached_user property) — no DB join needed",
+      "select_related not needed for user because Memcached is cheaper than a JOIN for this access pattern"
+    ]
+  },
+  "auth": {
+    "title": "JWT Authentication",
+    "accessToken": "60-minute lifetime, stored in React AuthContext (module-level memory, clears on reload)",
+    "refreshToken": "7-day lifetime, stored in httpOnly; SameSite=None; Secure cookie on the Next.js domain",
+    "refreshFlow": "Client → POST /api/auth/refresh (Next.js route handler, same-origin) → handler reads httpOnly cookie → proxies to Django /api/token/refresh/ → rotates cookie → returns new access token",
+    "blacklist": "Logout calls /api/auth/logout → handler reads cookie → blacklists token on Django → deletes cookie"
+  }
+}
