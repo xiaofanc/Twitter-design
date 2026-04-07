@@ -16,4 +16,4 @@ RUN pip install --no-cache-dir -r requirements-docker.txt
 COPY . .
 
 EXPOSE 8000
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "twitter.wsgi", "--workers", "2", "--bind", "0.0.0.0:8000", "--log-file", "-"]
