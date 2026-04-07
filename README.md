@@ -1,4 +1,7 @@
 # Twitter-design
+
+[![CI](https://github.com/xiaofanc/Twitter-design/actions/workflows/ci.yml/badge.svg)](https://github.com/xiaofanc/Twitter-design/actions/workflows/ci.yml)
+
 Design a Twitter from scratch
 
 ## VM Setup

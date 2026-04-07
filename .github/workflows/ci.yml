@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_DB: twitter
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      memcached:
+        image: memcached:1.6-alpine
+        ports:
+          - 11211:11211
+
+    env:
+      SECRET_KEY: ci-insecure-key
+      DEBUG: "True"
+      DB_NAME: twitter
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: localhost
+      DB_PORT: 5432
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      CELERY_BROKER_URL: redis://localhost:6379/3
+      USER_CACHE_BACKEND: memcached
+      MEMCACHED_LOCATION: localhost:11211
+      AWS_STORAGE_BUCKET_NAME: ""
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+          cache: pip
+          cache-dependency-path: requirements-docker.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-docker.txt coverage
+
+      - name: Run tests with coverage
+        run: |
+          coverage run manage.py test \
+            accounts.api.tests \
+            accounts.tests \
+            newsfeeds.api.tests \
+            newsfeeds.tests \
+            newsfeeds.tests_fanout \
+            tweets.api.tests \
+            tweets.tests \
+            comments.api.tests \
+            likes.api.tests \
+            inbox.api.tests \
+            friendships.api.tests \
+            friendships.tests \
+            utils.tests
+
+      - name: Check coverage threshold (95%)
+        run: coverage report --fail-under=95
