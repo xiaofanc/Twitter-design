@@ -26,6 +26,36 @@ from friendships.api.views import FriendshipViewSet
 from likes.api.views import LikeViewSet
 
 from django.conf import settings
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+import redis as redis_lib
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def system_stats(request):
+    try:
+        r = redis_lib.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0)
+        info = r.info()
+        hits = info.get('keyspace_hits', 0)
+        misses = info.get('keyspace_misses', 0)
+        total = hits + misses
+        hit_rate = (hits / total) if total > 0 else None
+        db0 = info.get('db0', {})
+        return Response({
+            'redis_hit_rate': hit_rate,
+            'redis_total_keys': info.get('db0', {}).get('keys', 0),
+            'redis_db0_keys': db0.get('keys', 0),
+            'cache_backend': 'Redis' if settings._USER_CACHE_BACKEND == 'redis' else 'Memcached',
+        })
+    except Exception:
+        return Response({
+            'redis_hit_rate': None,
+            'redis_total_keys': 0,
+            'redis_db0_keys': 0,
+            'cache_backend': 'unavailable',
+        })
 
 router = routers.DefaultRouter()
 router.register(r'api/users', UserViewSet)
@@ -46,6 +76,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('api/system-stats/', system_stats, name='system_stats'),
 ]
 
 if settings.DEBUG:

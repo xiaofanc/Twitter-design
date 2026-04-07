@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'corsheaders',
     'django_filters',
     'notifications',
 
@@ -76,7 +77,13 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    'CORS_ALLOWED_ORIGINS', 'http://localhost:3000'
+).split(',')
+CORS_ALLOW_CREDENTIALS = True
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -186,7 +193,7 @@ if _USER_CACHE_BACKEND == 'redis':
     _cache_location = _USER_CACHE_REDIS_URL
     _cache_options = {'CLIENT_CLASS': 'django_redis.client.DefaultClient'}
 else:
-    _cache_backend = 'django.core.cache.backends.memcached.MemcachedCache'
+    _cache_backend = 'django.core.cache.backends.memcached.PyMemcacheCache'
     _cache_location = _MEMCACHED_LOCATION
     _cache_options = {}
 
