@@ -3,7 +3,7 @@ builder = "nixpacks"
 buildCommand = "pip install -r requirements-docker.txt"
 
 [deploy]
-startCommand = "gunicorn twitter.wsgi --workers 2 --bind 0.0.0.0:$PORT --log-file -"
+startCommand = "./start.sh"
 healthcheckPath = "/api/accounts/login_status/"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"

@@ -16,4 +16,6 @@ RUN pip install --no-cache-dir -r requirements-docker.txt
 COPY . .
 
 EXPOSE 8000
-CMD gunicorn twitter.wsgi --workers 2 --bind 0.0.0.0:${PORT:-8000} --log-file -
+COPY start.sh .
+RUN chmod +x start.sh
+CMD ["./start.sh"]
